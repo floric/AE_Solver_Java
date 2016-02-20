@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<BorderPane prefHeight="500.0" prefWidth="500.0" stylesheets="@../resources/main_style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.floric.runningdinner.main.Controller">
+   <bottom>
+      <Label text="StatusLabel" BorderPane.alignment="BOTTOM_LEFT" />
+   </bottom>
+   <center>
+      <Accordion BorderPane.alignment="CENTER">
+        <panes>
+          <TitledPane animated="false" text="Teams">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="Teams count: " />
+                              <TextField fx:id="teamsCountTextField" />
+                              <Button fx:id="applyTeamsButton" mnemonicParsing="false" text="Apply">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+          </TitledPane>
+          <TitledPane animated="false" text="Coordinates">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label text="Generate random coordinates for the teams distribution:" />
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="Seed:" />
+                              <TextField fx:id="seedTextField" />
+                              <Label text="Factor:" />
+                              <TextField fx:id="factorTextField" />
+                              <Button fx:id="generateCoordinatesButton" mnemonicParsing="false" text="Apply">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <Label text="Coordinates" />
+                        <Canvas fx:id="coordinatesCanvas" height="300.0" width="500.0" VBox.vgrow="SOMETIMES" />
+                     </children>
+                  </VBox>
+               </content>
+          </TitledPane>
+          <TitledPane animated="false" text="Distribution">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </TitledPane>
+        </panes>
+      </Accordion>
+   </center>
+</BorderPane>

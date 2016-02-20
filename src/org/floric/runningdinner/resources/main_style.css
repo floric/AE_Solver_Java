@@ -1,0 +1,14 @@
+-fx-padding: 10px;
+
+.context-menu {
+    -fx-padding: 10px;
+}
+
+.button {
+    -fx-padding: 10px;
+}
+
+.label {
+    -fx-padding: 10px;
+
+}
