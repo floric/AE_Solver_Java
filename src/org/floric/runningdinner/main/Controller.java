@@ -2,11 +2,18 @@ package org.floric.runningdinner.main;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
-public class Controller {
+import javafx.scene.input.MouseEvent;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class Controller implements Initializable {
 
     // teams
 
@@ -14,7 +21,7 @@ public class Controller {
     private Button applyTeamsButton;
 
     @FXML
-    private TextField teamsCountTextField;
+    private Spinner<Integer> teamCountSpinner;
 
     // coordinates
 
@@ -30,10 +37,14 @@ public class Controller {
     @FXML
     private TextField factorTextField;
 
+    @FXML
+    protected void applyTeamsClicked(MouseEvent event) {
 
-    private void applyTeamCount(ActionEvent e) {
-        System.out.println("Change");
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        teamCountSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(3,99,9,3));
+    }
 }
 
