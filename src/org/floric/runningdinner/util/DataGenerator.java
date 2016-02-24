@@ -1,6 +1,8 @@
 package org.floric.runningdinner.util;
 
 import javafx.util.Pair;
+import org.floric.runningdinner.main.core.Core;
+import org.floric.runningdinner.main.core.Logger;
 
 import java.util.Random;
 
@@ -25,6 +27,11 @@ public class DataGenerator {
 
     }
 
+    public void recalculateData() {
+        coords = getRandomCoordinates();
+        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Testdata new generated for " + teamCount + " teams");
+    }
+
     private Pair<Double, Double>[] getRandomCoordinates() {
         Pair<Double, Double>[] coords = new Pair[getTeamCount()];
 
@@ -36,20 +43,23 @@ public class DataGenerator {
         return coords;
     }
 
+    public void changeSeed(long seed) {
+        rand.setSeed(seed);
+    }
 
     public int getTeamCount() {
         return teamCount;
     }
 
-    public Pair<Double, Double>[] getCoords() {
-        return coords;
+    public void setTeamCount(int count) {
+        if(teamCount >= Core.TEAMS_MIN && teamCount <= Core.TEAMS_MAX && count % 3 == 0) {
+            this.teamCount = count;
+        } else {
+            throw new IllegalArgumentException("Unsupported team count!");
+        }
     }
 
-    public double getDistanceBetween(int teamA, int teamB) {
-        if (teamA >= teamCount || teamB >= teamCount) {
-            throw new ArrayIndexOutOfBoundsException("Teamindex to high");
-        } else {
-            return Math.sqrt(Math.pow(coords[teamA].getKey() - coords[teamB].getKey(), 2) + Math.pow(coords[teamA].getValue() - coords[teamB].getValue(), 2));
-        }
+    public Pair<Double, Double>[] getCoords() {
+        return coords;
     }
 }

@@ -5,11 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Pair;
-import org.floric.runningdinner.util.DataGenerator;
-import org.floric.runningdinner.util.Statistics;
-
-import java.util.ArrayList;
+import org.floric.runningdinner.main.core.Logger;
 
 public class Main extends Application {
 
@@ -17,11 +13,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
-        primaryStage.setTitle("Hello World");
+        Logger.Log(Logger.LOG_VERBOSITY.IMPORTANT, "Application started!");
+
+        Parent root = FXMLLoader.load(getClass().getResource("../resources/main.fxml"));
+        primaryStage.setTitle("Running Dinner");
         primaryStage.setScene(new Scene(root, 640, 500));
         primaryStage.show();
-
 
         /*ArrayList<int[]> permutations = Statistics.getCookPermutations(STD_TEAM_COUNT);
         for(int[] p : permutations) {
@@ -30,15 +27,6 @@ public class Main extends Application {
             }
             System.out.println("");
         }*/
-
-        DataGenerator testData = new DataGenerator(STD_TEAM_COUNT, 1L);
-        Pair<Double, Double>[] coords = testData.getCoords();
-        for (int i = 0; i < coords.length; i++) {
-            Pair<Double, Double> coord = coords[i];
-            System.out.println(coord);
-        }
-
-
 
     }
 
