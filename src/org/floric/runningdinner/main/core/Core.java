@@ -1,6 +1,9 @@
 package org.floric.runningdinner.main.core;
 
+import org.floric.runningdinner.main.base.TeamGroup;
 import org.floric.runningdinner.util.DataGenerator;
+
+import java.util.ArrayList;
 
 /**
  * Created by Florian on 22.02.2016.
@@ -18,25 +21,7 @@ public class Core {
     private static Core core = null;
     private DataGenerator dataGen = new DataGenerator(TEAMS_DEFAULT, SEED_DEFAULT);
 
-    private boolean needsRecalculation = false;
-
-    public boolean isNeedsSave() {
-        return needsSave;
-    }
-
-    public void setNeedsSave(boolean needsSave) {
-        this.needsSave = needsSave;
-    }
-
-    public boolean isNeedsRecalculation() {
-        return needsRecalculation;
-    }
-
-    public void setNeedsRecalculation(boolean needsRecalculation) {
-        this.needsRecalculation = needsRecalculation;
-    }
-
-    private boolean needsSave = false;
+    private ArrayList<TeamGroup> groups = new ArrayList<>();
 
     private Core() {
 
@@ -44,7 +29,7 @@ public class Core {
 
     // use Singleton pattern
     public static Core getInstance() {
-        if(core == null) {
+        if (core == null) {
             core = new Core();
         }
 
@@ -53,5 +38,27 @@ public class Core {
 
     public DataGenerator getDataGenerator() {
         return dataGen;
+    }
+
+    public void addTeamGroup(TeamGroup t) {
+        if (t == null) {
+            throw new IllegalArgumentException("Teamgroup null!");
+        }
+        if (groups.contains(t)) {
+            throw new IllegalArgumentException("Teamgroup already added!");
+        }
+
+        groups.add(t);
+    }
+
+    public ArrayList<TeamGroup> getTeamsGroups() {
+        return groups;
+    }
+
+    public TeamGroup getTeamGroupByIndex(int i) {
+        if (i < 0 || i >= groups.size()) {
+            throw new IndexOutOfBoundsException("Teamindex unknown!");
+        }
+        return groups.get(i);
     }
 }

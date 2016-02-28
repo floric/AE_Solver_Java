@@ -15,7 +15,7 @@ public class MeanCluster implements ICluster {
     private int expectedClasses = 0;
 
     public MeanCluster(int expectedClasses) {
-        if(expectedClasses <= 0) {
+        if (expectedClasses <= 0) {
             throw new IllegalArgumentException("At least 1 center for clustering needed!");
         }
 
@@ -25,7 +25,7 @@ public class MeanCluster implements ICluster {
 
     @Override
     public void setPoints(Pair<? super Number, ? super Number>[] coordinates) {
-        this.coordinates = coordinates;
+        this.coordinates.add(coordinates);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class MeanCluster implements ICluster {
     }
 
     @Override
-    public Pair<Double,Double>[] getCenters() {
+    public Pair<Double, Double>[] getCenters() {
         return centers;
     }
 

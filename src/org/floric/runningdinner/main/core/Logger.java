@@ -5,12 +5,12 @@ package org.floric.runningdinner.main.core;
  */
 public class Logger {
 
-    public enum LOG_VERBOSITY {
-        INFO, MAIN, IMPORTANT, ERROR;
-    }
-
     // TODO Add current time
     public static void Log(LOG_VERBOSITY state, String message) {
         System.out.println("[" + state.toString() + " | Time]\t" + message);
+    }
+
+    public enum LOG_VERBOSITY {
+        INFO, MAIN, IMPORTANT, ERROR
     }
 }

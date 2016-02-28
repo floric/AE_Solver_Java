@@ -7,8 +7,11 @@ import javafx.util.Pair;
  */
 public interface ISolver {
 
-    public int[][] getSolution();
-    public double getNormalizedProgress();
-    public void setTeamCount();
-    public void setCoordinates(Pair<Double, Double>[] coords);
+    int[][] getSolution();
+
+    double getNormalizedProgress();
+
+    void setTeamCount();
+
+    void setCoordinates(Pair<Double, Double>[] coords);
 }

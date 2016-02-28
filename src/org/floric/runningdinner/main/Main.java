@@ -11,8 +11,12 @@ public class Main extends Application {
 
     final static int STD_TEAM_COUNT = 9;
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Logger.Log(Logger.LOG_VERBOSITY.IMPORTANT, "Application started!");
 
         Parent root = FXMLLoader.load(getClass().getResource("../resources/main.fxml"));
@@ -28,10 +32,5 @@ public class Main extends Application {
             System.out.println("");
         }*/
 
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

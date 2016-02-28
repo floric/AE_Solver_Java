@@ -57,9 +57,9 @@ public class MainController implements Initializable {
             try {
                 int currentValue = Integer.parseInt(currentInput);
 
-                if(currentValue > max) {
+                if (currentValue > max) {
                     currentValue = max;
-                } else if(currentValue < min) {
+                } else if (currentValue < min) {
                     currentValue = min;
                 }
 

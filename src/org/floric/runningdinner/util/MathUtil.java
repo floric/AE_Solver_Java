@@ -2,12 +2,10 @@ package org.floric.runningdinner.util;
 
 import javafx.util.Pair;
 
-import java.lang.Math;
-
 /**
  * Created by Florian on 24.02.2016.
  */
-public final class MathUtil<T extends Number> {
+public final class MathUtil {
 
     private MathUtil() {
     }

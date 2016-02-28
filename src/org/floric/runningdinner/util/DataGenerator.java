@@ -1,6 +1,8 @@
 package org.floric.runningdinner.util;
 
 import javafx.util.Pair;
+import org.floric.runningdinner.main.base.Person;
+import org.floric.runningdinner.main.base.Team;
 import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
 
@@ -11,11 +13,10 @@ import java.util.Random;
  */
 public class DataGenerator {
 
+    private static int COORD_MULTIPLY = 10;
     private int teamCount = 0;
     private Pair<Double, Double>[] coords;
     private Random rand;
-
-    private static int COORD_MULTIPLY = 10;
 
     public DataGenerator(int teamCount, long seed) {
 
@@ -25,6 +26,11 @@ public class DataGenerator {
         coords = getRandomCoordinates();
 
 
+    }
+
+    public static Team getRandomTeam() {
+        Random tempRand = new Random(1L);
+        return new Team(new Person("P" + String.valueOf(tempRand.nextInt(9999)), "N"), new Person("P" + String.valueOf(tempRand.nextInt(9999)), "N"));
     }
 
     public void recalculateData() {
@@ -52,7 +58,7 @@ public class DataGenerator {
     }
 
     public void setTeamCount(int count) {
-        if(teamCount >= Core.TEAMS_MIN && teamCount <= Core.TEAMS_MAX && count % 3 == 0) {
+        if (teamCount >= Core.TEAMS_MIN && teamCount <= Core.TEAMS_MAX && count % 3 == 0) {
             this.teamCount = count;
         } else {
             throw new IllegalArgumentException("Unsupported team count!");
