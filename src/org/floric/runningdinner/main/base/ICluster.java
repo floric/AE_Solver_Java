@@ -1,7 +1,9 @@
 package org.floric.runningdinner.main.base;
 
+import javafx.geometry.Point2D;
 import javafx.util.Pair;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -9,15 +11,15 @@ import java.util.ArrayList;
  */
 public interface ICluster {
 
-    void setPoints(Pair<? super Number, ? super Number>[] coordinates);
+    void setPoints(ArrayList<Team> teams);
 
-    void clusterPoints();
+    void clusterPoints(int expectedClasses, ArrayList<Team> teams);
 
-    Pair<Double, Double>[] getCenters();
+    ArrayList<Point2D> getCenters();
 
-    ArrayList<Pair<Double, Double>[]> getClusteredPoints();
+    ArrayList<TeamGroup> getClusteredPoints();
 
     default double getError() {
-        return 0;
+        return Double.POSITIVE_INFINITY;
     }
 }

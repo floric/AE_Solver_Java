@@ -1,11 +1,14 @@
 package org.floric.runningdinner.util;
 
+import javafx.geometry.Point2D;
 import javafx.util.Pair;
 import org.floric.runningdinner.main.base.Person;
 import org.floric.runningdinner.main.base.Team;
 import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -14,39 +17,30 @@ import java.util.Random;
 public class DataGenerator {
 
     private static int COORD_MULTIPLY = 10;
+    private static Point2D COORD_MIN = new Point2D(0.0, 0.0);
+    private static Point2D COORD_MAX = new Point2D(100.0, 100.0);
     private int teamCount = 0;
-    private Pair<Double, Double>[] coords;
     private Random rand;
+
 
     public DataGenerator(int teamCount, long seed) {
 
         this.teamCount = teamCount;
         rand = new Random(seed);
-
-        coords = getRandomCoordinates();
-
-
     }
 
-    public static Team getRandomTeam() {
-        Random tempRand = new Random(1L);
-        return new Team(new Person("P" + String.valueOf(tempRand.nextInt(9999)), "N"), new Person("P" + String.valueOf(tempRand.nextInt(9999)), "N"));
+    public Team getRandomTeam() {
+        Team t = new Team(new Person("P" + String.valueOf(rand.nextInt(9999)), "N"), new Person("P" + String.valueOf(rand.nextInt(9999)), "N"));
+        t.setLocation(getRandomPoint());
+        return t;
     }
 
-    public void recalculateData() {
-        coords = getRandomCoordinates();
-        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Testdata new generated for " + teamCount + " teams");
+    public Point2D getRandomPoint(Point2D min, Point2D max) {
+        return new Point2D(rand.nextDouble() * (max.getX() + min.getX()), rand.nextDouble() * (max.getY() + min.getY()));
     }
 
-    private Pair<Double, Double>[] getRandomCoordinates() {
-        Pair<Double, Double>[] coords = new Pair[getTeamCount()];
-
-        // fill with random coordinates
-        for (int i = 0; i < coords.length; i++) {
-            coords[i] = new Pair<>(new Double(rand.nextDouble() * COORD_MULTIPLY), new Double(rand.nextDouble() * COORD_MULTIPLY));
-        }
-
-        return coords;
+    public Point2D getRandomPoint() {
+        return new Point2D(rand.nextDouble() * (COORD_MAX.getX() + COORD_MIN.getX()), rand.nextDouble() * (COORD_MAX.getY() + COORD_MIN.getY()));
     }
 
     public void changeSeed(long seed) {
@@ -65,7 +59,15 @@ public class DataGenerator {
         }
     }
 
-    public Pair<Double, Double>[] getCoords() {
-        return coords;
+    public ArrayList<Team> getRandomTeams() {
+        ArrayList<Team> randomTeams = new ArrayList<>();
+
+        for (int i = 0; i < teamCount; i++) {
+            randomTeams.add(getRandomTeam());
+        }
+
+        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Generated " + teamCount + " new random teams!");
+
+        return randomTeams;
     }
 }

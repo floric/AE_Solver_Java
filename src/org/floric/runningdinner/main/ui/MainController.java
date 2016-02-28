@@ -11,9 +11,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import org.floric.runningdinner.main.base.ICluster;
+import org.floric.runningdinner.main.base.Team;
+import org.floric.runningdinner.main.base.TeamGroup;
 import org.floric.runningdinner.main.core.Core;
+import org.floric.runningdinner.util.MeanCluster;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -47,7 +52,20 @@ public class MainController implements Initializable {
         Core c = Core.getInstance();
         c.getDataGenerator().changeSeed(randomSeedSpinner.getValue());
         c.getDataGenerator().setTeamCount(teamCountSpinner.getValue());
-        c.getDataGenerator().recalculateData();
+
+        ICluster cluster = new MeanCluster();
+        cluster.clusterPoints(3, c.getDataGenerator().getRandomTeams());
+        ArrayList<TeamGroup> clusteredPoints = cluster.getClusteredPoints();
+
+        // draw points
+        for(int i = 0; i < clusteredPoints.size(); i++) {
+            TeamGroup tg = clusteredPoints.get(i);
+            ArrayList<Team> teams = tg.getTeams();
+            System.out.println("Class " + i + " has " + teams.size() + " teams!");
+            for(Team t: teams) {
+                gc.fillOval(t.getLocation().getX()+100, t.getLocation().getY()+100, 4, 4);
+            }
+        }
     }
 
     private void initSpinner(Spinner<Integer> spinner, int min, int max, int def, int step) {

@@ -44,4 +44,20 @@ public class TeamTest {
         t.setLocation(newLocation);
         assertEquals(newLocation, t.getLocation());
     }
+
+    @Test
+    public void testGetGroupIndex() throws Exception {
+        assertEquals(0, t.getGroupIndex());
+    }
+
+    @Test
+    public void testSetGroupIndex() throws Exception {
+        int newIndex = 0;
+        t.setGroupIndex(newIndex);
+        assertEquals(newIndex, t.getGroupIndex());
+
+        newIndex = 5;
+        t.setGroupIndex(newIndex);
+        assertEquals(newIndex, t.getGroupIndex());
+    }
 }

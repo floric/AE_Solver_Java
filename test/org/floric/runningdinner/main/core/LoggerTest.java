@@ -12,5 +12,6 @@ public class LoggerTest {
     @Test
     public void testLog() throws Exception {
         Logger.Log(Logger.LOG_VERBOSITY.INFO, "Logtest");
+        Logger.Log(Logger.LOG_VERBOSITY.ERROR, "");
     }
 }

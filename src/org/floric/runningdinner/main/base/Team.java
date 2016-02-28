@@ -10,6 +10,7 @@ public class Team {
     private Person pA;
     private Person pB;
     private Point2D location = Point2D.ZERO;
+    private int groupIndex = 0;
 
     public Team(Person pA, Person pB) {
         if (pA == null || pB == null) {
@@ -33,5 +34,18 @@ public class Team {
 
     public Person getPersonB() {
         return pB;
+    }
+
+    public int getGroupIndex() {
+        return groupIndex;
+    }
+
+    public void setGroupIndex(int groupIndex) {
+        this.groupIndex = groupIndex;
+    }
+
+    @Override
+    public String toString() {
+        return new String("Team (" + pA + " & " + pB + ") in " + groupIndex + " group");
     }
 }
