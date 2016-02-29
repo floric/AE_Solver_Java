@@ -1,10 +1,10 @@
 package org.floric.runningdinner.main.base;
 
 import javafx.geometry.Point2D;
+import org.floric.runningdinner.main.core.Person;
+import org.floric.runningdinner.main.core.Team;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.security.cert.PolicyNode;
 
 import static org.junit.Assert.*;
 
@@ -50,14 +50,4 @@ public class TeamTest {
         assertEquals(0, t.getGroupIndex());
     }
 
-    @Test
-    public void testSetGroupIndex() throws Exception {
-        int newIndex = 0;
-        t.setGroupIndex(newIndex);
-        assertEquals(newIndex, t.getGroupIndex());
-
-        newIndex = 5;
-        t.setGroupIndex(newIndex);
-        assertEquals(newIndex, t.getGroupIndex());
-    }
 }

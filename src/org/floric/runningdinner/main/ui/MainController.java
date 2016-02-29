@@ -12,13 +12,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import org.floric.runningdinner.main.base.ICluster;
-import org.floric.runningdinner.main.base.Team;
-import org.floric.runningdinner.main.base.TeamGroup;
+import org.floric.runningdinner.main.core.Team;
+import org.floric.runningdinner.main.core.TeamGroup;
 import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.util.MeanCluster;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -50,12 +51,13 @@ public class MainController implements Initializable {
     @FXML
     protected void applyNewTeamsClicked(MouseEvent event) {
         Core c = Core.getInstance();
+        c.Reset();
         c.getDataGenerator().changeSeed(randomSeedSpinner.getValue());
         c.getDataGenerator().setTeamCount(teamCountSpinner.getValue());
 
         ICluster cluster = new MeanCluster();
         cluster.clusterPoints(3, c.getDataGenerator().getRandomTeams());
-        ArrayList<TeamGroup> clusteredPoints = cluster.getClusteredPoints();
+        List<TeamGroup> clusteredPoints = c.getTeamsGroups();
 
         // draw points
         for(int i = 0; i < clusteredPoints.size(); i++) {

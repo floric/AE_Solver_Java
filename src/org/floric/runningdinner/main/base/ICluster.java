@@ -1,9 +1,9 @@
 package org.floric.runningdinner.main.base;
 
 import javafx.geometry.Point2D;
-import javafx.util.Pair;
+import org.floric.runningdinner.main.core.Team;
+import org.floric.runningdinner.main.core.TeamGroup;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -16,8 +16,6 @@ public interface ICluster {
     void clusterPoints(int expectedClasses, ArrayList<Team> teams);
 
     ArrayList<Point2D> getCenters();
-
-    ArrayList<TeamGroup> getClusteredPoints();
 
     default double getError() {
         return Double.POSITIVE_INFINITY;

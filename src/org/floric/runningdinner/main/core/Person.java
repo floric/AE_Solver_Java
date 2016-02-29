@@ -1,4 +1,4 @@
-package org.floric.runningdinner.main.base;
+package org.floric.runningdinner.main.core;
 
 /**
  * Created by florian on 28.02.2016.

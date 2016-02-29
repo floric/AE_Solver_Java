@@ -1,9 +1,8 @@
 package org.floric.runningdinner.main.base;
 
+import org.floric.runningdinner.main.core.Person;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by florian on 28.02.2016.

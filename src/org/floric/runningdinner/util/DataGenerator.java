@@ -1,13 +1,11 @@
 package org.floric.runningdinner.util;
 
 import javafx.geometry.Point2D;
-import javafx.util.Pair;
-import org.floric.runningdinner.main.base.Person;
-import org.floric.runningdinner.main.base.Team;
+import org.floric.runningdinner.main.core.Person;
+import org.floric.runningdinner.main.core.Team;
 import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -24,7 +22,6 @@ public class DataGenerator {
 
 
     public DataGenerator(int teamCount, long seed) {
-
         this.teamCount = teamCount;
         rand = new Random(seed);
     }

@@ -1,9 +1,11 @@
 package org.floric.runningdinner.main.core;
 
-import org.floric.runningdinner.main.base.TeamGroup;
 import org.floric.runningdinner.util.DataGenerator;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Florian on 22.02.2016.
@@ -21,10 +23,15 @@ public class Core {
     private static Core core = null;
     private DataGenerator dataGen = new DataGenerator(TEAMS_DEFAULT, SEED_DEFAULT);
 
-    private ArrayList<TeamGroup> groups = new ArrayList<>();
+    private Map<Integer, TeamGroup> groups = new HashMap<>();
 
     private Core() {
+        // basic group for every new team
+        Init();
+    }
 
+    private void Init() {
+        groups.put(0, new TeamGroup());
     }
 
     // use Singleton pattern
@@ -40,25 +47,45 @@ public class Core {
         return dataGen;
     }
 
-    public void addTeamGroup(TeamGroup t) {
+    public void setTeamGroup(TeamGroup t, int groupIndex) {
         if (t == null) {
             throw new IllegalArgumentException("Teamgroup null!");
         }
-        if (groups.contains(t)) {
-            throw new IllegalArgumentException("Teamgroup already added!");
+
+        groups.put(groupIndex, t);
+    }
+
+    public void addTeam(Team t) {
+        groups.get(0).addTeam(t);
+    }
+
+    public void setTeamToGroup(Team t, int groupIndex) {
+        t.getCurrentGroup().removeTeam(t);
+        getTeamGroup(groupIndex).addTeam(t);
+    }
+
+    public TeamGroup getTeamGroup(int groupIndex) {
+        if(groups.containsKey(groupIndex)) {
+            return groups.get(groupIndex);
+        } else {
+            TeamGroup newGroup = new TeamGroup();
+            groups.put(groupIndex, newGroup);
+            return newGroup;
         }
-
-        groups.add(t);
     }
 
-    public ArrayList<TeamGroup> getTeamsGroups() {
-        return groups;
+    public List<TeamGroup> getTeamsGroups() {
+        // only return groups with more then one team
+        return groups.values().stream().filter(teamGroup -> teamGroup.getTeams().size() > 0).collect(Collectors.toList());
     }
 
-    public TeamGroup getTeamGroupByIndex(int i) {
-        if (i < 0 || i >= groups.size()) {
-            throw new IndexOutOfBoundsException("Teamindex unknown!");
-        }
-        return groups.get(i);
+    public int getTeamGroupIndex(TeamGroup t) {
+        return groups.entrySet().stream().filter(integerTeamGroupEntry -> integerTeamGroupEntry.getValue() == t).findFirst().get().getKey();
     }
+
+    public void Reset() {
+        groups.clear();
+        Init();
+    }
+
 }

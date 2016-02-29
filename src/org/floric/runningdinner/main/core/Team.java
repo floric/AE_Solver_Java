@@ -1,4 +1,4 @@
-package org.floric.runningdinner.main.base;
+package org.floric.runningdinner.main.core;
 
 import javafx.geometry.Point2D;
 
@@ -10,14 +10,16 @@ public class Team {
     private Person pA;
     private Person pB;
     private Point2D location = Point2D.ZERO;
-    private int groupIndex = 0;
 
     public Team(Person pA, Person pB) {
         if (pA == null || pB == null) {
             throw new IllegalArgumentException();
         }
+
         this.pA = pA;
         this.pB = pB;
+
+        Core.getInstance().addTeam(this);
     }
 
     public Point2D getLocation() {
@@ -37,15 +39,17 @@ public class Team {
     }
 
     public int getGroupIndex() {
-        return groupIndex;
+        return Core.getInstance().getTeamGroupIndex(
+                Core.getInstance().getTeamsGroups().stream().filter(teamGroup -> teamGroup.containsTeam(this)).findFirst().get()
+        );
     }
 
-    public void setGroupIndex(int groupIndex) {
-        this.groupIndex = groupIndex;
+    public TeamGroup getCurrentGroup() {
+        return Core.getInstance().getTeamsGroups().stream().filter(teamGroup -> teamGroup.containsTeam(this)).findFirst().get();
     }
 
     @Override
     public String toString() {
-        return new String("Team (" + pA + " & " + pB + ") in " + groupIndex + " group");
+        return new String("Team (" + pA + " & " + pB + ") in " + getGroupIndex() + " group");
     }
 }
