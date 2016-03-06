@@ -19,7 +19,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Logger.Log(Logger.LOG_VERBOSITY.IMPORTANT, "Application started!");
 
-        Parent root = FXMLLoader.load(getClass().getResource("../resources/main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("ui/main.fxml"));
         primaryStage.setTitle("Running Dinner");
         primaryStage.setScene(new Scene(root, 640, 500));
         primaryStage.show();

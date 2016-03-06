@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="mainPane" prefHeight="500.0" prefWidth="500.0" stylesheets="@../../resources/main_style.css" xmlns="http://javafx.com/javafx/8.0.72" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.floric.runningdinner.main.ui.MainController">
+    <bottom>
+        <Label text="StatusLabel" BorderPane.alignment="BOTTOM_LEFT" />
+    </bottom>
+    <center>
+        <Accordion BorderPane.alignment="CENTER">
+            <panes>
+                <TitledPane animated="false" text="Teams">
+               <content>
+                  <ScrollPane>
+                    <content>
+                        <VBox fx:id="teamsBox" spacing="10.0">
+                           <children>
+                            <Button mnemonicParsing="false" onMouseClicked="#addTeamSlot" prefWidth="150.0" text="Add team">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                              </Button>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                    </content>
+                  </ScrollPane>
+               </content>
+                </TitledPane>
+                <TitledPane animated="false" text="Coordinates">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <Label text="Generate random coordinates for the teams distribution:" />
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Seed:" />
+                                        <Spinner fx:id="randomSeedSpinner" editable="true" />
+                                        <Button fx:id="generateCoordinatesButton" mnemonicParsing="false" onMouseClicked="#applyNewTeamsClicked" text="Apply">
+                                            <HBox.margin>
+                                                <Insets />
+                                            </HBox.margin>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                                <Label text="Coordinates" />
+                                <Pane fx:id="canvasPane" prefHeight="1.0" prefWidth="1.0" style="-fx-background-color: red;" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <Canvas fx:id="coordinatesCanvas" height="1.0" width="1.0" />
+                                    </children>
+                                </Pane>
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <TitledPane animated="false" text="Distribution">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                </TitledPane>
+            </panes>
+        </Accordion>
+    </center>
+</BorderPane>
