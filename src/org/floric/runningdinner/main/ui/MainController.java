@@ -16,17 +16,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.floric.runningdinner.main.base.ICluster;
+import org.floric.runningdinner.main.base.IPersistent;
 import org.floric.runningdinner.main.core.Logger;
 import org.floric.runningdinner.main.core.Team;
 import org.floric.runningdinner.main.core.TeamGroup;
 import org.floric.runningdinner.main.core.Core;
+import org.floric.runningdinner.util.DataWriterReader;
 import org.floric.runningdinner.util.MeanCluster;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -64,8 +64,6 @@ public class MainController implements Initializable {
         c.getDataGenerator().changeSeed(randomSeedSpinner.getValue());
         c.getDataGenerator().setTeamCount(teamCountSpinner.getValue());
 
-
-
         ICluster cluster = new MeanCluster();
         cluster.clusterPoints(3, c.getDataGenerator().getRandomTeams());
         List<TeamGroup> clusteredPoints = c.getTeamsGroups();
@@ -83,34 +81,30 @@ public class MainController implements Initializable {
 
     @FXML
     protected void addTeamSlot(MouseEvent event) {
-        /*try {
-            Object box = new FXMLLoader().load(getClass().getResource("teambox.fxml"));
-            if(box instanceof HBox) {
-                HBox teamLineBox = (HBox) box;
-
-                // add listener to remove this slot again on button click
-                Optional<Node> deleteButtonOptional = teamLineBox.getChildren().stream().filter(node -> node instanceof Button).filter(node -> ((Button) node).getText().compareTo("Remove") == 0).findFirst();
-                if(deleteButtonOptional.isPresent()) {
-                    Button deleteButton = (Button) deleteButtonOptional.get();
-                    deleteButton.setOnMouseClicked(event1 -> {
-                        teamsBox.getChildren().remove(teamLineBox);
-                        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot deleted!");
-                    });
-                } else {
-                    Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Button listener for team couldn't be applied!");
-                }
-
-                // add slot to teamslist
-                teamsBox.getChildren().add(teamsBox.getChildren().size() - 1, teamLineBox);
-
-
-            }
-        } catch (IOException e) {
-            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Button UI for teams wasn't found!");
-        }*/
-
         TeamHBox teamBox = new TeamHBox();
         teamsBox.getChildren().add(teamsBox.getChildren().size() - 1, teamBox);
+
+        teamBox.getDeleteButton().setOnMouseClicked(event1 -> {
+            teamsBox.getChildren().remove(teamBox);
+            Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot deleted!");
+        });
+
+        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot added!");
+    }
+
+    @FXML
+    protected void importFile() {
+
+    }
+
+    @FXML
+    protected void exportFile(MouseEvent event) {
+        DataWriterReader rw = new DataWriterReader();
+        teamsBox.getChildren().stream().filter(node -> node instanceof IPersistent).forEach(node1 -> {
+            IPersistent teamBox = (IPersistent) node1;
+            rw.addObject(teamBox);
+        });
+        rw.writeFile("");
     }
 
     private void initSpinner(Spinner<Integer> spinner, int min, int max, int def, int step) {
