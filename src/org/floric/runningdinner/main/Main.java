@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
 
 public class Main extends Application {
@@ -19,18 +20,12 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Logger.Log(Logger.LOG_VERBOSITY.IMPORTANT, "Application started!");
 
-        Parent root = FXMLLoader.load(getClass().getResource("ui/main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("../resources/main.fxml"));
         primaryStage.setTitle("Running Dinner");
-        primaryStage.setScene(new Scene(root, 640, 500));
+        primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
 
-        /*ArrayList<int[]> permutations = Statistics.getCookPermutations(STD_TEAM_COUNT);
-        for(int[] p : permutations) {
-            for(int i = 0; i < p.length; i++) {
-                System.out.print(p[i]+ ",");
-            }
-            System.out.println("");
-        }*/
-
+        // call exit from core on exit try
+        primaryStage.setOnCloseRequest(event -> Core.getInstance().exit());
     }
 }

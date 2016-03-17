@@ -1,10 +1,18 @@
 package org.floric.runningdinner.util;
 
 import org.floric.runningdinner.main.base.IPersistent;
+import org.floric.runningdinner.main.core.Core;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
-/**
+/** Writing/Reading files
+ *
  * Created by florian on 07.03.2016.
  */
 public class DataWriterReader {
@@ -27,16 +35,14 @@ public class DataWriterReader {
         }
     }
 
-    public void writeFile(String filePath) {
+    public void writeFile(String filePath) throws IOException {
         objects.entrySet().forEach(entry -> {
-            strBld.append("[[" + entry.getKey() + "]]\n");
-            entry.getValue().forEach(obj -> {
-                strBld.append(obj.writeObject());
-            });
+            strBld.append("[[").append(entry.getKey()).append("]]\n");
+            entry.getValue().forEach(obj -> strBld.append(obj.writeObject()));
         });
 
-        System.out.println("OUTPUT:");
-        System.out.println(strBld.toString());
+        List<String> lines = Arrays.asList(strBld.toString().split("\n"));
+        Files.write(Paths.get(Core.getInstance().getSafePath()), lines, Charset.forName("UTF-8"));
     }
 
 
