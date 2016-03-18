@@ -27,12 +27,12 @@ public class Logger {
                     break;
                 case MAIN:
                     statusLabel.setText(message);
-                    statusLabel.setTextFill(Color.BLACK);
+                    statusLabel.setTextFill(Color.WHITE);
 
                     break;
                 case ERROR:
                     statusLabel.setText(message);
-                    statusLabel.setTextFill(Color.RED);
+                    statusLabel.setTextFill(Color.valueOf("#D21544"));
 
                     break;
                 default:

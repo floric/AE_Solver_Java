@@ -1,11 +1,55 @@
+@font-face {
+    src: url('blue_highway_d.ttf');
+}
+
+@font-face {
+    src: url('blue_highway_rg.ttf');
+}
+
+.main {
+    -fx-font-family: "BlueHighway-Regular";
+    -fx-font-size: 9pt;
+    -fx-text-fill: black;
+    -fx-background-color: #555555;
+}
+
 .context-menu {
     -fx-padding: 10px;
 }
 
-.label {
-
+.button {
+    -fx-background-color: #0096c9;
+    -fx-background-radius: 3,3,3,3;
+    -fx-text-fill: white;
 }
 
-.headline {
-    
+.headlineOne {
+    -fx-font-family: "BlueHighway-Regular";
+    -fx-font-size: 16pt;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 0px 10px 10px 0px;
+}
+
+.headlineTwo {
+    -fx-font-family: "BlueHighway-Regular";
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.titled-pane {
+    -fx-text-fill: white;
+    -fx-background-color: #0C607C;
+    -fx-background-radius: 3,3,3,3;
+}
+.titled-pane:focused {
+    -fx-text-fill: white;
+}
+.titled-pane > .title {
+    -fx-padding: 10px;
+    -fx-background-color: #0C607C;
+}
+
+.titled-pane:focused > .title {
+    -fx-color: -fx-focus-color;
 }

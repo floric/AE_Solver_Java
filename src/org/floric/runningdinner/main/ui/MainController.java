@@ -183,7 +183,7 @@ public class MainController implements Initializable, Closeable {
 
     @FXML
     private void aboutApplication() {
-
+        Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Not implemented yet.");
     }
 
     @FXML

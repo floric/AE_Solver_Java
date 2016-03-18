@@ -29,6 +29,7 @@ public class Team implements IPersistent {
         this.pB = pB;
 
         Core.getInstance().addTeam(this);
+        Core.getInstance().writeSafeFile();
     }
 
     public static int getNextIndex() {
@@ -45,6 +46,7 @@ public class Team implements IPersistent {
 
     public void setLocation(Point2D location) {
         this.location = location;
+        Core.getInstance().writeSafeFile();
     }
 
     public Person getPersonA() {

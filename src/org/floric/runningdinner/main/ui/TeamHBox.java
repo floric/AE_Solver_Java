@@ -1,7 +1,6 @@
 package org.floric.runningdinner.main.ui;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,7 +18,7 @@ import org.floric.runningdinner.main.core.Team;
  */
 public class TeamHBox extends HBox {
 
-    private Label teamIndexLabel = new Label(String.valueOf(Team.getNextIndex()));
+    private Label teamIndexLabel = new Label("0");
     private Label namesLabel = new Label("Names");
     private Label coordsLabel = new Label("Coordinates");
     private Label namesAndLabel = new Label("&");
@@ -46,15 +45,12 @@ public class TeamHBox extends HBox {
 
         // layout properties
         teamIndexLabel.setMinWidth(20);
-        this.setSpacing(5);
-
-        namesLabel.setPadding(new Insets(0, 10, 0, 0));
-        coordsLabel.setPadding(new Insets(0, 10, 0, 10));
-        namesAndLabel.setPadding(new Insets(0, 10, 0, 10));
+        this.setSpacing(10);
 
         setAlignment(Pos.CENTER_LEFT);
 
         assignedTeam = new Team(new Person(namesOneTextField.getText()), new Person(namesTwoTextField.getText()));
+        teamIndexLabel.setText(String.valueOf(assignedTeam.getTeamIndex()));
         Core.getInstance().addTeam(assignedTeam);
 
         addListeners();
@@ -105,8 +101,6 @@ public class TeamHBox extends HBox {
                 Person pA = assignedTeam.getPersonA();
                 pA.formatCommaInput(namesOneTextField.getText());
                 namesOneTextField.setText(pA.getLastName() + ", " + pA.getFirstName());
-
-                Core.getInstance().writeSafeFile();
             }
         });
 
@@ -115,8 +109,6 @@ public class TeamHBox extends HBox {
                 Person pB = assignedTeam.getPersonB();
                 pB.formatCommaInput(namesTwoTextField.getText());
                 namesTwoTextField.setText(pB.getLastName() + ", " + pB.getFirstName());
-
-                Core.getInstance().writeSafeFile();
             }
         });
 
@@ -127,16 +119,14 @@ public class TeamHBox extends HBox {
                 String[] parts = input.split(",");
 
                 // validate input
-                if (parts.length == 2) {
+                try {
                     assignedTeam.setLocation(new Point2D(Double.valueOf(parts[0]), Double.valueOf(parts[1])));
-                } else {
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex2) {
                     assignedTeam.setLocation(new Point2D(0, 0));
                     Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Invalid coordinates format!");
                 }
 
                 coordinatesTextField.setText(assignedTeam.getLocation().getX() + ", " + assignedTeam.getLocation().getY());
-
-                Core.getInstance().writeSafeFile();
             }
         });
     }

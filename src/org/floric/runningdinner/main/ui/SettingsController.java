@@ -4,11 +4,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import org.floric.runningdinner.main.base.IObserver;
 import org.floric.runningdinner.main.core.Core;
-import org.floric.runningdinner.util.DataWriterReader;
 
 import java.io.File;
 import java.net.URL;
@@ -34,13 +35,13 @@ public class SettingsController implements Initializable, IObserver {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Core.getInstance().addObserver(this);
-
         update();
     }
 
     @FXML
-    private void closeDialog() {
-
+    private void closeDialog(MouseEvent ev) {
+        Stage stage = (Stage) pane.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
@@ -54,9 +55,6 @@ public class SettingsController implements Initializable, IObserver {
         if (file != null) {
             Core.getInstance().setSafeDir(file.getAbsolutePath());
         }
-
-        DataWriterReader rw = new DataWriterReader();
-
 
     }
 

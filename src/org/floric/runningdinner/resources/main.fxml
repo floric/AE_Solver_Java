@@ -4,23 +4,55 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainPane" prefHeight="500.0" prefWidth="500.0"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainPane" prefHeight="500.0" prefWidth="500.0" styleClass="main"
             stylesheets="@main_style.css" xmlns="http://javafx.com/javafx/8.0.65"
             fx:controller="org.floric.runningdinner.main.ui.MainController">
+    <bottom>
+        <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label fx:id="statusLabel" styleClass="headlineTwo" text="Ready.">
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </HBox.margin>
+                </Label>
+            </children>
+            <BorderPane.margin>
+                <Insets/>
+            </BorderPane.margin>
+        </HBox>
+    </bottom>
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu mnemonicParsing="false" text="Menu">
+                    <items>
+                        <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" onAction="#openSettings"
+                                  text="Settings"/>
+                        <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#aboutApplication"
+                                  text="About"/>
+                        <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#exitApplication" text="Exit"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
     <center>
         <Accordion BorderPane.alignment="CENTER">
             <panes>
-                <TitledPane animated="false" styleClass="headline" text="TEAMS">
+                <TitledPane animated="false" text="TEAMS">
                <content>
                   <ScrollPane>
                     <content>
                         <VBox fx:id="teamsBox" spacing="10.0">
                            <children>
-                              <HBox alignment="CENTER_LEFT">
+                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
                                     <Label text="Teams:">
                                        <HBox.margin>
-                                          <Insets right="10.0" />
+                                           <Insets/>
                                        </HBox.margin>
                                     </Label>
                                   <Button mnemonicParsing="false" onMouseClicked="#addTeamSlot" prefWidth="150.0" text="Add new">
@@ -28,12 +60,6 @@
                                           <Insets right="5.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button mnemonicParsing="false" onMouseClicked="#importFile" text="Import">
-                                       <HBox.margin>
-                                          <Insets right="5.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                     <Button mnemonicParsing="false" text="Export"/>
                                  </children>
                               </HBox>
                            </children>
@@ -47,10 +73,10 @@
                 </TitledPane>
                 <TitledPane animated="false" text="COORDINATES">
                     <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                             <children>
                                 <Label text="Generate random coordinates for the teams distribution:" />
-                                <HBox alignment="CENTER_LEFT">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <children>
                                         <Label text="Seed:" />
                                         <Spinner fx:id="randomSeedSpinner" editable="true" />
@@ -79,33 +105,4 @@
             </panes>
         </Accordion>
     </center>
-   <bottom>
-      <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER_LEFT">
-         <children>
-             <Label fx:id="statusLabel" text="Ready.">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <HBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </HBox.margin></Label>
-         </children>
-         <BorderPane.margin>
-            <Insets />
-         </BorderPane.margin>
-      </HBox>
-   </bottom>
-   <top>
-      <MenuBar BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="Menu">
-            <items>
-                  <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" onAction="#openSettings" text="Settings" />
-              <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#aboutApplication" text="About" />
-              <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#exitApplication" text="Exit" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-   </top>
 </BorderPane>
