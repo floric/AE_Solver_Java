@@ -1,11 +1,13 @@
 package org.floric.runningdinner.main.base;
 
-/**
+import java.util.List;
+
+/** Persistent interface
+ *
  * Created by florian on 07.03.2016.
  */
 public interface IPersistent {
 
-    String writeObject();
+    List<String> getDataFromObject();
     String getType();
-    void readObject(String data);
 }

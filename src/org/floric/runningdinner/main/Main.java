@@ -18,7 +18,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Logger.Log(Logger.LOG_VERBOSITY.IMPORTANT, "Application started!");
+        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Application started!");
+
+        Core c = Core.getInstance();
+        c.readSafeFile();
 
         Parent root = FXMLLoader.load(getClass().getResource("../resources/main.fxml"));
         primaryStage.setTitle("Running Dinner");

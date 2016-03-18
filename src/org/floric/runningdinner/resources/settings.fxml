@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-
-<BorderPane fx:id="pane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.floric.runningdinner.main.ui.SettingsController">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="pane" xmlns="http://javafx.com/javafx/8.0.65"
+            fx:controller="org.floric.runningdinner.main.ui.SettingsController">
    <top>
       <Label style="text-transform: uppercase;" styleClass="headline" stylesheets="@main_style.css" text="SETTINGS" BorderPane.alignment="TOP_LEFT">
          <BorderPane.margin>
@@ -41,10 +36,11 @@
                         <Insets right="10.0" />
                      </padding>
                   </Label>
-                  <Button fx:id="changeSafePathButton" mnemonicParsing="false" onMouseClicked="#changeSettingsPath" text="Set path" />
+                   <Button fx:id="changeSafePathButton" mnemonicParsing="false" onMouseClicked="#changeSettingsPath"
+                           text="Set folder"/>
                </children>
             </HBox>
-            <Label text="Safe path" />
+             <Label text="Safe folder"/>
          </children>
       </GridPane>
    </center>

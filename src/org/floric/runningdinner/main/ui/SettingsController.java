@@ -6,22 +6,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import org.floric.runningdinner.main.base.IObserver;
 import org.floric.runningdinner.main.core.Core;
+import org.floric.runningdinner.util.DataWriterReader;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /** Settings Controller
  *
  * Created by florian on 17.03.2016.
  */
-public class SettingsController implements Initializable {
+public class SettingsController implements Initializable, IObserver {
 
     @FXML
     private BorderPane pane;
@@ -36,7 +33,9 @@ public class SettingsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        updateUI();
+        Core.getInstance().addObserver(this);
+
+        update();
     }
 
     @FXML
@@ -46,21 +45,24 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void changeSettingsPath() {
-        FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Running Dinner Safefile", "*." + Core.getInstance().getSafeExtension())
-        );
+        DirectoryChooser chooser = new DirectoryChooser();
+        //chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Running Dinner Safefile", "*." + Core.getInstance().SAFE_EXTENSION));
+        chooser.setInitialDirectory(new File(Core.getInstance().getSafeDir()));
 
-        File file = chooser.showSaveDialog(pane.getScene().getWindow());
+        File file = chooser.showDialog(pane.getScene().getWindow());
 
         if (file != null) {
-            Core.getInstance().setSafePath(file.toString());
-            updateUI();
+            Core.getInstance().setSafeDir(file.getAbsolutePath());
         }
+
+        DataWriterReader rw = new DataWriterReader();
+
 
     }
 
-    private void updateUI() {
+
+    @Override
+    public void update() {
         pathLabel.setText(Core.getInstance().getSafePath());
     }
 }

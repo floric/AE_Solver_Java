@@ -1,19 +1,14 @@
 package org.floric.runningdinner.main.core;
 
-import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import org.floric.runningdinner.main.Main;
+import org.floric.runningdinner.main.base.IObserver;
+import org.floric.runningdinner.main.base.IPersistent;
 import org.floric.runningdinner.util.DataGenerator;
+import org.floric.runningdinner.util.DataWriterReader;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,8 +17,9 @@ import java.util.stream.Collectors;
  *
  * Created by Florian on 22.02.2016.
  */
-public class Core {
+public class Core implements IPersistent {
 
+    // constants
     public final static int TEAMS_MAX = 99;
     public final static int TEAMS_MIN = 3;
     public final static int TEAMS_DEFAULT = 9;
@@ -32,21 +28,23 @@ public class Core {
     public final static int SEED_MAX = 1000;
     public final static int SEED_DEFAULT = 1;
 
+    public final static String SAFE_EXTENSION = "rdsv";
+    public final static String SAFE_FILENAME = "rdsafe";
+
     private static Core core = null;
+
     private DataGenerator dataGen = new DataGenerator(TEAMS_DEFAULT, SEED_DEFAULT);
 
+    private Map<Integer, Team> teams = new HashMap<>();
     private Map<Integer, TeamGroup> groups = new HashMap<>();
 
-    private String safeExtension = "rdsf";
-    private String safePath = System.getProperty("user.home") + "\\runningdinner." + safeExtension;
+    private String safeDir = new String(System.getProperty("user.home"));
+
+    private List<IObserver> observers = new LinkedList<>();
 
     private Core() {
         // basic group for every new team
         Init();
-    }
-
-    private void Init() {
-        groups.put(0, new TeamGroup());
     }
 
     // use Singleton pattern
@@ -56,6 +54,19 @@ public class Core {
         }
 
         return core;
+    }
+
+    private void Init() {
+        groups.put(0, new TeamGroup());
+        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Core initialized.");
+    }
+
+    public void addObserver(IObserver obj) {
+        observers.add(obj);
+    }
+
+    public void notifyObservers() {
+        observers.forEach(obj -> obj.update());
     }
 
     public DataGenerator getDataGenerator() {
@@ -72,6 +83,14 @@ public class Core {
 
     public void addTeam(Team t) {
         groups.get(0).addTeam(t);
+        teams.put(t.getTeamIndex(), t);
+    }
+
+    public boolean removeTeam(Team t) {
+        teams.remove(t.getTeamIndex());
+        t.getCurrentGroup().removeTeam(t);
+
+        return true;
     }
 
     public void setTeamToGroup(Team t, int groupIndex) {
@@ -81,10 +100,12 @@ public class Core {
 
     public TeamGroup getTeamGroup(int groupIndex) {
         if(groups.containsKey(groupIndex)) {
+
             return groups.get(groupIndex);
         } else {
             TeamGroup newGroup = new TeamGroup();
             groups.put(groupIndex, newGroup);
+
             return newGroup;
         }
     }
@@ -99,23 +120,22 @@ public class Core {
     }
 
     public String getSafePath() {
-        return safePath;
+        return safeDir + "\\" + SAFE_FILENAME + "." + SAFE_EXTENSION;
     }
 
-    public void setSafePath(String safePath) {
-        this.safePath = safePath;
+    public String getSafeDir() {
+        return safeDir;
     }
 
-    public String getSafeExtension() {
-        return safeExtension;
-    }
-
-    public void setSafeExtension(String safeExtension) {
-        this.safeExtension = safeExtension;
+    public void setSafeDir(String str) {
+        safeDir = str;
+        notifyObservers();
     }
 
     public void Reset() {
+        teams.clear();
         groups.clear();
+
         Init();
     }
 
@@ -124,4 +144,44 @@ public class Core {
         Platform.exit();
     }
 
+    public void writeSafeFile() {
+        DataWriterReader dataRW = new DataWriterReader();
+
+        // add core and static items for saving
+        dataRW.addObject(this);
+        teams.forEach((index, obj) -> dataRW.addObject(obj));
+
+        try {
+            dataRW.writeFile(getSafePath());
+
+            Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Safe successfull.");
+        } catch (IOException e) {
+            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Safefile writing failed!");
+        }
+    }
+
+    public void readSafeFile() {
+        DataWriterReader dataRW = new DataWriterReader();
+        try {
+            List<IPersistent> readObjs = dataRW.readFile(getSafePath());
+            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "READ " + readObjs.size() + " elemets!");
+
+            Logger.Log(Logger.LOG_VERBOSITY.INFO, "Safefile successfully read.");
+        } catch (IOException e) {
+            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Safefile reading failed!");
+        }
+    }
+
+    @Override
+    public List<String> getDataFromObject() {
+        List<String> data = new LinkedList<>();
+        data.add(getSafeDir());
+
+        return data;
+    }
+
+    @Override
+    public String getType() {
+        return "Core";
+    }
 }

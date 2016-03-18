@@ -16,11 +16,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.floric.runningdinner.main.base.ICluster;
-import org.floric.runningdinner.main.base.IPersistent;
+import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
 import org.floric.runningdinner.main.core.Team;
 import org.floric.runningdinner.main.core.TeamGroup;
-import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.util.DataWriterReader;
 import org.floric.runningdinner.util.MeanCluster;
 
@@ -52,6 +51,8 @@ public class MainController implements Initializable, Closeable {
     @FXML
     private MenuItem settingsMenuItem;
 
+    @FXML
+    private Label statusLabel;
 
     @FXML
     private Spinner<Integer> teamCountSpinner;
@@ -65,6 +66,17 @@ public class MainController implements Initializable, Closeable {
     @FXML
     private TextField seedTextField;
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        Logger.setStatusLabel(statusLabel);
+
+        //initSpinner(teamCountSpinner, Core.TEAMS_MIN, Core.TEAMS_MAX, Core.TEAMS_DEFAULT, 3);
+        initSpinner(randomSeedSpinner, Core.SEED_MIN, Core.SEED_MAX, Core.SEED_DEFAULT, 1);
+
+        gc = coordinatesCanvas.getGraphicsContext2D();
+
+        addListeners();
+    }
 
     @FXML
     protected void applyNewTeamsClicked(MouseEvent event) {
@@ -95,35 +107,29 @@ public class MainController implements Initializable, Closeable {
 
         teamBox.getDeleteButton().setOnMouseClicked(event1 -> {
             teamsBox.getChildren().remove(teamBox);
+            Core.getInstance().removeTeam(teamBox.getAssignedTeam());
             Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot deleted!");
+
+            exportFile();
         });
 
         Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot added!");
+
+        exportFile();
     }
 
     @FXML
     protected void importFile() {
-
+        DataWriterReader rw = new DataWriterReader();
+        try {
+            rw.readFile(Core.getInstance().getSafePath());
+        } catch (IOException e) {
+            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Fileread failed!");
+        }
     }
 
-    @FXML
-    protected void exportFile(MouseEvent event) {
-        DataWriterReader rw = new DataWriterReader();
-
-        String exportPath = "";
-
-        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Teams exported to: " + exportPath);
-
-        teamsBox.getChildren().stream().filter(node -> node instanceof IPersistent).forEach(node1 -> {
-            IPersistent teamBox = (IPersistent) node1;
-            rw.addObject(teamBox);
-        });
-
-        try {
-            rw.writeFile(Core.getInstance().getSafePath());
-        } catch (IOException e) {
-            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Filewrite was not successfull!");
-        }
+    private void exportFile() {
+        Core.getInstance().writeSafeFile();
     }
 
     private void initSpinner(Spinner<Integer> spinner, int min, int max, int def, int step) {
@@ -144,16 +150,6 @@ public class MainController implements Initializable, Closeable {
                 spinner.editorProperty().getValue().setText(String.valueOf(def));
             }
         });
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        //initSpinner(teamCountSpinner, Core.TEAMS_MIN, Core.TEAMS_MAX, Core.TEAMS_DEFAULT, 3);
-        initSpinner(randomSeedSpinner, Core.SEED_MIN, Core.SEED_MAX, Core.SEED_DEFAULT, 1);
-
-        gc = coordinatesCanvas.getGraphicsContext2D();
-
-        addListeners();
     }
 
     private void addListeners() {
@@ -199,7 +195,7 @@ public class MainController implements Initializable, Closeable {
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Settings");
             dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner((Stage) canvasPane.getScene().getWindow());
+            dialogStage.initOwner(canvasPane.getScene().getWindow());
             dialogStage.setScene(new Scene(root));
 
             // Show the dialog and wait until the user closes it

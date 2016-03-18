@@ -1,6 +1,7 @@
 package org.floric.runningdinner.main.core;
 
-/**
+/** Person class
+ *
  * Created by florian on 28.02.2016.
  */
 public class Person {
@@ -11,6 +12,24 @@ public class Person {
     public Person(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public Person(String strFromat) {
+        formatCommaInput(strFromat);
+    }
+
+    public void formatCommaInput(String strFromat) {
+        String[] names = strFromat.split(",");
+
+        if (names.length >= 2) {
+            this.lastName = names[0];
+            this.firstName = names[1];
+            if (firstName.indexOf(" ") == 0) {
+                firstName = firstName.substring(1);
+            }
+        } else {
+            this.firstName = names[0];
+        }
     }
 
     public String getFirstName() {
@@ -31,6 +50,6 @@ public class Person {
 
     @Override
     public String toString() {
-        return new String(lastName + ", " + firstName);
+        return lastName + ", " + firstName;
     }
 }

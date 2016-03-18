@@ -1,14 +1,22 @@
 package org.floric.runningdinner.main.core;
 
 import javafx.geometry.Point2D;
+import org.floric.runningdinner.main.base.IPersistent;
 
-/**
+import java.util.LinkedList;
+import java.util.List;
+
+/** Team class
+ *
  * Created by florian on 28.02.2016.
  */
-public class Team {
+public class Team implements IPersistent {
+
+    private static int countingTeamIndex = 0;
 
     private Person pA;
     private Person pB;
+    private int teamIndex;
     private Point2D location = Point2D.ZERO;
 
     public Team(Person pA, Person pB) {
@@ -16,10 +24,19 @@ public class Team {
             throw new IllegalArgumentException();
         }
 
+        this.teamIndex = Team.getNextIndex();
         this.pA = pA;
         this.pB = pB;
 
         Core.getInstance().addTeam(this);
+    }
+
+    public static int getNextIndex() {
+        return countingTeamIndex++;
+    }
+
+    public int getTeamIndex() {
+        return teamIndex;
     }
 
     public Point2D getLocation() {
@@ -51,5 +68,22 @@ public class Team {
     @Override
     public String toString() {
         return new String("Team (" + pA + " & " + pB + ") in " + getGroupIndex() + " group");
+    }
+
+    @Override
+    public String getType() {
+        return "Team";
+    }
+
+    @Override
+    public List<String> getDataFromObject() {
+        List<String> objs = new LinkedList<>();
+
+        objs.add(getPersonA().getFirstName() + " " + getPersonA().getLastName());
+        objs.add(getPersonB().getFirstName() + " " + getPersonB().getLastName());
+        objs.add(String.valueOf(getLocation().getX()));
+        objs.add(String.valueOf(getLocation().getY()));
+
+        return objs;
     }
 }
