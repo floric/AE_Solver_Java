@@ -98,6 +98,8 @@ public class TeamHBox extends HBox {
 
     // events for save after editing the text fields
     private void addListeners() {
+        // add automatic saving after leaving the input focus
+
         namesOneTextField.focusedProperty().addListener((field, oldValue, newValue) -> {
             if (!newValue) {
                 Person pA = assignedTeam.getPersonA();
