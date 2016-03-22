@@ -18,6 +18,11 @@ public class Person {
         formatCommaInput(strFromat);
     }
 
+    public Person() {
+        this.firstName = "Vorname";
+        this.lastName = "Nachname";
+    }
+
     public void formatCommaInput(String strFromat) {
         String[] names = strFromat.split(",");
 
@@ -30,6 +35,8 @@ public class Person {
         } else {
             this.firstName = names[0];
         }
+
+        Core.getInstance().writeSafeFile();
     }
 
     public String getFirstName() {

@@ -16,10 +16,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.floric.runningdinner.main.base.ICluster;
-import org.floric.runningdinner.main.core.Core;
-import org.floric.runningdinner.main.core.Logger;
-import org.floric.runningdinner.main.core.Team;
-import org.floric.runningdinner.main.core.TeamGroup;
+import org.floric.runningdinner.main.base.IObserver;
+import org.floric.runningdinner.main.core.*;
 import org.floric.runningdinner.util.DataWriterReader;
 import org.floric.runningdinner.util.MeanCluster;
 
@@ -30,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable, Closeable {
+public class MainController implements Initializable, Closeable, IObserver {
 
     @FXML
     private BorderPane mainPane;
@@ -76,6 +74,8 @@ public class MainController implements Initializable, Closeable {
         gc = coordinatesCanvas.getGraphicsContext2D();
 
         addListeners();
+
+        update();
     }
 
     @FXML
@@ -102,8 +102,16 @@ public class MainController implements Initializable, Closeable {
 
     @FXML
     protected void addTeamSlot(MouseEvent event) {
-        TeamHBox teamBox = new TeamHBox();
-        teamsBox.getChildren().add(teamsBox.getChildren().size() - 1, teamBox);
+        Core.getInstance().addTeam(new Team(new Person(), new Person()));
+
+        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot added!");
+
+        exportFile();
+    }
+
+    private void addTeamSlot(Team t) {
+        TeamHBox teamBox = new TeamHBox(t);
+        teamsBox.getChildren().add(teamBox);
 
         teamBox.getDeleteButton().setOnMouseClicked(event1 -> {
             teamsBox.getChildren().remove(teamBox);
@@ -112,10 +120,6 @@ public class MainController implements Initializable, Closeable {
 
             exportFile();
         });
-
-        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot added!");
-
-        exportFile();
     }
 
     @FXML
@@ -209,6 +213,19 @@ public class MainController implements Initializable, Closeable {
     @Override
     public void close() throws IOException {
         Platform.exit();
+    }
+
+    @Override
+    public void update() {
+        int currentTeamsSize = teamsBox.getChildren().size();
+        teamsBox.getChildren().remove(1, currentTeamsSize);
+
+        List<TeamGroup> teamsGroups = Core.getInstance().getTeamsGroups();
+        for (TeamGroup tg : teamsGroups) {
+            for (Team t : tg.getTeams()) {
+                addTeamSlot(t);
+            }
+        }
     }
 }
 

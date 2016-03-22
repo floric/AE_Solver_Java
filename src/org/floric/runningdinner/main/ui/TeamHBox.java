@@ -8,7 +8,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
 import org.floric.runningdinner.main.core.Person;
 import org.floric.runningdinner.main.core.Team;
@@ -30,7 +29,7 @@ public class TeamHBox extends HBox {
 
     private Team assignedTeam;
 
-    public TeamHBox() {
+    public TeamHBox(Team t) {
         ObservableList<Node> boxChildren = this.getChildren();
 
         // add elements to box
@@ -49,9 +48,11 @@ public class TeamHBox extends HBox {
 
         setAlignment(Pos.CENTER_LEFT);
 
-        assignedTeam = new Team(new Person(namesOneTextField.getText()), new Person(namesTwoTextField.getText()));
+        assignedTeam = t;
         teamIndexLabel.setText(String.valueOf(assignedTeam.getTeamIndex()));
-        Core.getInstance().addTeam(assignedTeam);
+        namesOneTextField.setText(t.getPersonA().toString());
+        namesTwoTextField.setText(t.getPersonB().toString());
+        coordinatesTextField.setText(t.getLocation().getX() + ", " + t.getLocation().getY());
 
         addListeners();
     }

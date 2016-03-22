@@ -1,6 +1,7 @@
 package org.floric.runningdinner.main.core;
 
 import javafx.application.Platform;
+import org.floric.runningdinner.main.base.IObservable;
 import org.floric.runningdinner.main.base.IObserver;
 import org.floric.runningdinner.main.base.IPersistent;
 import org.floric.runningdinner.util.DataGenerator;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
  *
  * Created by Florian on 22.02.2016.
  */
-public class Core implements IPersistent {
+public class Core implements IPersistent, IObservable {
 
     // constants
     public final static int TEAMS_MAX = 99;
@@ -84,12 +85,15 @@ public class Core implements IPersistent {
     public void addTeam(Team t) {
         groups.get(0).addTeam(t);
         teams.put(t.getTeamIndex(), t);
+
+        notifyObservers();
     }
 
     public boolean removeTeam(Team t) {
         teams.remove(t.getTeamIndex());
         t.getCurrentGroup().removeTeam(t);
 
+        notifyObservers();
         return true;
     }
 
@@ -137,6 +141,8 @@ public class Core implements IPersistent {
         groups.clear();
 
         Init();
+
+        notifyObservers();
     }
 
     public void exit() {
@@ -163,13 +169,14 @@ public class Core implements IPersistent {
     public void readSafeFile() {
         DataWriterReader dataRW = new DataWriterReader();
         try {
-            List<IPersistent> readObjs = dataRW.readFile(getSafePath());
-            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Read " + readObjs.size() + " elements!");
+            dataRW.readFile(getSafePath());
 
             Logger.Log(Logger.LOG_VERBOSITY.INFO, "Safefile successfully read.");
         } catch (IOException e) {
             Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Safefile reading failed!");
         }
+
+        notifyObservers();
     }
 
     @Override

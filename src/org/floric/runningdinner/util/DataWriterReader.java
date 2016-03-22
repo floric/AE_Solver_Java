@@ -1,10 +1,8 @@
 package org.floric.runningdinner.util;
 
-import javafx.geometry.Point2D;
 import org.floric.runningdinner.main.base.IPersistent;
 import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
-import org.floric.runningdinner.main.core.Person;
 import org.floric.runningdinner.main.core.Team;
 
 import java.io.IOException;
@@ -60,9 +58,7 @@ public class DataWriterReader {
         Files.write(Paths.get(Core.getInstance().getSafePath()), lines, Charset.forName("UTF-8"));
     }
 
-    public List<IPersistent> readFile(String filePath) throws IOException {
-        List<IPersistent> readObjs = new LinkedList<>();
-
+    public void readFile(String filePath) throws IOException {
         Logger.Log(Logger.LOG_VERBOSITY.INFO, "Read safefile at: " + filePath);
 
         String[] readLines = Files.lines(Paths.get(filePath)).toArray(size -> new String[size]);
@@ -81,21 +77,11 @@ public class DataWriterReader {
                     for (int j = 0; j < linesCount; j++) {
                         int currentLineIndex = i + 2 + j;
 
-                        String[] parts = readLines[currentLineIndex].split("\\|");
-
-                        // stop at parse error
-                        if (parts.length != 4) {
-                            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Read error for teams in line " + currentLineIndex);
-                            return readObjs;
-                        }
-
-                        Team t = new Team(new Person(parts[0]), new Person(parts[1]));
-                        t.setLocation(new Point2D(Float.valueOf(parts[2]), Float.valueOf(parts[3])));
-
-                        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Read team: " + t.toString());
+                        TeamFactory tf = new TeamFactory();
+                        Team t = tf.getInstanceFromString(readLines[currentLineIndex]);
 
                         // add read team
-                        readObjs.add(t);
+                        Core.getInstance().addTeam(t);
                     }
                 } else if(foundIdentifier.compareTo("Core") == 0) {
                     //Core.getInstance().setSafeDir();
@@ -106,8 +92,6 @@ public class DataWriterReader {
                 }
             }
         }
-
-        return readObjs;
     }
 
     private List<String> setSubListFromStringArr(String[] arr, int start, int end) {
