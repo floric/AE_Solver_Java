@@ -81,8 +81,8 @@ public class Team implements IPersistent {
     public List<String> getDataFromObject() {
         List<String> objs = new LinkedList<>();
 
-        objs.add(getPersonA().getFirstName() + " " + getPersonA().getLastName());
-        objs.add(getPersonB().getFirstName() + " " + getPersonB().getLastName());
+        objs.add(getPersonA().toString());
+        objs.add(getPersonB().toString());
         objs.add(String.valueOf(getLocation().getX()));
         objs.add(String.valueOf(getLocation().getY()));
 

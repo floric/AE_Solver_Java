@@ -164,7 +164,7 @@ public class Core implements IPersistent {
         DataWriterReader dataRW = new DataWriterReader();
         try {
             List<IPersistent> readObjs = dataRW.readFile(getSafePath());
-            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "READ " + readObjs.size() + " elemets!");
+            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Read " + readObjs.size() + " elements!");
 
             Logger.Log(Logger.LOG_VERBOSITY.INFO, "Safefile successfully read.");
         } catch (IOException e) {

@@ -1,7 +1,11 @@
 package org.floric.runningdinner.util;
 
+import javafx.geometry.Point2D;
 import org.floric.runningdinner.main.base.IPersistent;
 import org.floric.runningdinner.main.core.Core;
+import org.floric.runningdinner.main.core.Logger;
+import org.floric.runningdinner.main.core.Person;
+import org.floric.runningdinner.main.core.Team;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -59,6 +63,8 @@ public class DataWriterReader {
     public List<IPersistent> readFile(String filePath) throws IOException {
         List<IPersistent> readObjs = new LinkedList<>();
 
+        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Read safefile at: " + filePath);
+
         String[] readLines = Files.lines(Paths.get(filePath)).toArray(size -> new String[size]);
 
         for (int i = 0; i < readLines.length; i++) {
@@ -68,24 +74,36 @@ public class DataWriterReader {
                 String foundIdentifier = line.substring(2, line.length() - 2);
                 int linesCount = Integer.valueOf(readLines[i + 1]);
 
-                /*// differ types
-                if(foundIdentifier.compareTo("TeamBox") == 0) {
+                // differ types
+                if (foundIdentifier.compareTo("Team") == 0) {
 
-                    for (int j = 0; j < linesCount / elem.getUsedLines(); j++) {
+                    // iterate through every team
+                    for (int j = 0; j < linesCount; j++) {
+                        int currentLineIndex = i + 2 + j;
 
+                        String[] parts = readLines[currentLineIndex].split("\\|");
+
+                        // stop at parse error
+                        if (parts.length != 4) {
+                            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Read error for teams in line " + currentLineIndex);
+                            return readObjs;
+                        }
+
+                        Team t = new Team(new Person(parts[0]), new Person(parts[1]));
+                        t.setLocation(new Point2D(Float.valueOf(parts[2]), Float.valueOf(parts[3])));
+
+                        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Read team: " + t.toString());
+
+                        // add read team
+                        readObjs.add(t);
                     }
-
-
-                    readObjs.add(elem);
-
-                    Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Read Teambox");
                 } else if(foundIdentifier.compareTo("Core") == 0) {
-                    Core.getInstance().readData(setSubListFromStringArr(readLines, i + 2, i + 2 + linesCount).stream().reduce(String::concat).get());
+                    //Core.getInstance().setSafeDir();
 
                     Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Read Core");
                 } else {
                     Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Unknown file type!");
-                }*/
+                }
             }
         }
 
