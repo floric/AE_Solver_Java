@@ -13,22 +13,29 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.floric.runningdinner.main.base.ICluster;
 import org.floric.runningdinner.main.base.IObserver;
 import org.floric.runningdinner.main.core.*;
-import org.floric.runningdinner.util.DataWriterReader;
+import org.floric.runningdinner.util.ILogOutput;
 import org.floric.runningdinner.util.MeanCluster;
+import org.reactfx.util.FxTimer;
 
+import java.awt.geom.Point2D;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable, Closeable, IObserver {
+public class MainController implements Initializable, Closeable, IObserver, ILogOutput {
+
+    private static final int CANVAS_PADDING = 20;
+    private static final int CANVAS_POINT_SIZE = 5;
 
     @FXML
     private BorderPane mainPane;
@@ -38,9 +45,11 @@ public class MainController implements Initializable, Closeable, IObserver {
     private VBox teamsBox;
 
     @FXML
-    private Button applyTeamsButton;
+    private Button groupTeamsButton;
     @FXML
-    private Button generateCoordinatesButton;
+    private Button addRandomTeamsButton;
+    @FXML
+    private Button clearTeamsButton;
 
     @FXML
     private MenuItem exitMenuItem;
@@ -53,9 +62,9 @@ public class MainController implements Initializable, Closeable, IObserver {
     private Label statusLabel;
 
     @FXML
-    private Spinner<Integer> teamCountSpinner;
-    @FXML
     private Spinner<Integer> randomSeedSpinner;
+    @FXML
+    private Spinner<Integer> randomTeamsCountSpinner;
 
     @FXML
     private Canvas coordinatesCanvas;
@@ -66,9 +75,9 @@ public class MainController implements Initializable, Closeable, IObserver {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Logger.setStatusLabel(statusLabel);
+        Logger.addObserver(this);
 
-        //initSpinner(teamCountSpinner, Core.TEAMS_MIN, Core.TEAMS_MAX, Core.TEAMS_DEFAULT, 3);
+        initSpinner(randomTeamsCountSpinner, Core.TEAMS_MIN, Core.TEAMS_MAX, Core.TEAMS_DEFAULT, 1);
         initSpinner(randomSeedSpinner, Core.SEED_MIN, Core.SEED_MAX, Core.SEED_DEFAULT, 1);
 
         gc = coordinatesCanvas.getGraphicsContext2D();
@@ -79,34 +88,75 @@ public class MainController implements Initializable, Closeable, IObserver {
     }
 
     @FXML
-    protected void applyNewTeamsClicked(MouseEvent event) {
+    protected void groupTeamsClicked(MouseEvent event) {
         Core c = Core.getInstance();
-        c.Reset();
-        c.getDataGenerator().changeSeed(randomSeedSpinner.getValue());
-        c.getDataGenerator().setTeamCount(teamCountSpinner.getValue());
+
+        ArrayList<Team> allTeams = new ArrayList<>();
+        c.getTeamsGroups().forEach(teamGroup -> allTeams.addAll(teamGroup.getTeams()));
 
         ICluster cluster = new MeanCluster();
-        cluster.clusterPoints(3, c.getDataGenerator().getRandomTeams());
-        List<TeamGroup> clusteredPoints = c.getTeamsGroups();
+        cluster.clusterPoints(3, allTeams);
 
-        // draw points
+        drawTeamGroups();
+    }
+
+    private void drawTeamGroups() {
+        List<TeamGroup> clusteredPoints = Core.getInstance().getTeamsGroups();
+        Point2D min = Team.getMinLocation(Core.getInstance().getTeams());
+        Point2D max = Team.getMaxLocation(Core.getInstance().getTeams());
+
+        gc.clearRect(0, 0, canvasPane.getWidth(), canvasPane.getHeight());
+
+        // draw points for every teamgroup
         for(int i = 0; i < clusteredPoints.size(); i++) {
             TeamGroup tg = clusteredPoints.get(i);
             ArrayList<Team> teams = tg.getTeams();
-            System.out.println("Class " + i + " has " + teams.size() + " teams!");
+
             for(Team t: teams) {
-                gc.fillOval(t.getLocation().getX()+100, t.getLocation().getY()+100, 4, 4);
+                float colorAngle = i * 360.0f / clusteredPoints.size();
+
+                Point2D screenCoords = transformCoordinatesToCanvas(min, max, t.getLocation(), new Point2D.Double(canvasPane.getWidth() - 2 * CANVAS_PADDING, canvasPane.getHeight() - 2 * CANVAS_PADDING));
+
+                // draw point
+                gc.setFill(Color.hsb(colorAngle, 1.0, 1.0));
+                gc.fillOval(screenCoords.getX() + CANVAS_PADDING, screenCoords.getY() + CANVAS_PADDING, CANVAS_POINT_SIZE, CANVAS_POINT_SIZE);
             }
         }
+    }
+
+    private Point2D transformCoordinatesToCanvas(Point2D min, Point2D max, Point2D point, Point2D canvasSize) {
+        Point2D boundingDistance = new Point2D.Double(max.getX() - min.getX(), max.getY() - min.getY());
+
+        double xRatio = (canvasSize.getX() - min.getX()) / boundingDistance.getX();
+        double yRatio = (canvasSize.getY() - min.getY()) / boundingDistance.getY();
+        double scaleFactor = xRatio < yRatio ? xRatio : yRatio;
+
+        double x = (point.getX() - min.getX()) * scaleFactor;
+        double y = (point.getY() - min.getY()) * scaleFactor;
+
+        return new Point2D.Double(x, y);
+    }
+
+    @FXML
+    protected void addRandomTeamsClicked(MouseEvent event) {
+        Core c = Core.getInstance();
+        c.getDataGenerator().changeSeed(randomSeedSpinner.getValue());
+
+        for (int i = 0; i < randomTeamsCountSpinner.getValue(); i++) {
+            Team t = c.getDataGenerator().getRandomTeam();
+            Core.getInstance().addTeam(t);
+        }
+    }
+
+    @FXML
+    protected void clearTeamsClicked(MouseEvent event) {
+        Core.getInstance().reset();
     }
 
     @FXML
     protected void addTeamSlot(MouseEvent event) {
         Core.getInstance().addTeam(new Team(new Person(), new Person()));
-
         Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot added!");
-
-        exportFile();
     }
 
     private void addTeamSlot(Team t) {
@@ -117,23 +167,7 @@ public class MainController implements Initializable, Closeable, IObserver {
             teamsBox.getChildren().remove(teamBox);
             Core.getInstance().removeTeam(teamBox.getAssignedTeam());
             Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot deleted!");
-
-            exportFile();
         });
-    }
-
-    @FXML
-    protected void importFile() {
-        DataWriterReader rw = new DataWriterReader();
-        try {
-            rw.readFile(Core.getInstance().getSafePath());
-        } catch (IOException e) {
-            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Fileread failed!");
-        }
-    }
-
-    private void exportFile() {
-        Core.getInstance().writeSafeFile();
     }
 
     private void initSpinner(Spinner<Integer> spinner, int min, int max, int def, int step) {
@@ -177,7 +211,7 @@ public class MainController implements Initializable, Closeable, IObserver {
     }
 
     private void repaintCanvas() {
-
+        drawTeamGroups();
     }
 
     @FXML
@@ -218,14 +252,34 @@ public class MainController implements Initializable, Closeable, IObserver {
     @Override
     public void update() {
         int currentTeamsSize = teamsBox.getChildren().size();
-        teamsBox.getChildren().remove(1, currentTeamsSize);
+        teamsBox.getChildren().remove(2, currentTeamsSize);
 
         List<TeamGroup> teamsGroups = Core.getInstance().getTeamsGroups();
         for (TeamGroup tg : teamsGroups) {
-            for (Team t : tg.getTeams()) {
-                addTeamSlot(t);
-            }
+            tg.getTeams().forEach(this::addTeamSlot);
         }
+    }
+
+    @Override
+    public void updateLogOutput(String text, Logger.LOG_VERBOSITY verbosity) {
+        switch (verbosity) {
+            case MAIN:
+                statusLabel.setTextFill(Color.WHITE);
+
+                break;
+            case ERROR:
+                statusLabel.setTextFill(Color.RED);
+
+                break;
+            default:
+        }
+
+        statusLabel.setText(text);
+
+        // add timer to reset the text after DISPLAY_DURATION_SEC seconds
+        FxTimer.runLater(
+                Duration.ofSeconds(Core.DISPLAY_DURATION_SEC),
+                () -> statusLabel.setText(""));
     }
 }
 

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="org.reactfx:reactfx:1.4.1" type="repository">
+    <properties maven-id="org.reactfx:reactfx:1.4.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/reactfx-1.4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/reactfx-1.4.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

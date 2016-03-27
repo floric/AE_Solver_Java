@@ -15,7 +15,7 @@ public class Person {
     }
 
     public Person(String strFromat) {
-        formatCommaInput(strFromat);
+        formatCommaInput(strFromat, false);
     }
 
     public Person() {
@@ -23,7 +23,7 @@ public class Person {
         this.lastName = "Nachname";
     }
 
-    public void formatCommaInput(String strFromat) {
+    public void formatCommaInput(String strFromat, boolean needsSafe) {
         String[] names = strFromat.split(",");
 
         if (names.length >= 2) {
@@ -36,7 +36,9 @@ public class Person {
             this.firstName = names[0];
         }
 
-        Core.getInstance().writeSafeFile();
+        if (needsSafe) {
+            Core.getInstance().setToDirtySafeState();
+        }
     }
 
     public String getFirstName() {
@@ -45,7 +47,7 @@ public class Person {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-        Core.getInstance().writeSafeFile();
+        Core.getInstance().setToDirtySafeState();
     }
 
     public String getLastName() {
@@ -54,7 +56,7 @@ public class Person {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-        Core.getInstance().writeSafeFile();
+        Core.getInstance().setToDirtySafeState();
     }
 
     @Override

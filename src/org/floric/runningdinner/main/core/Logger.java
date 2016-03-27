@@ -1,10 +1,11 @@
 package org.floric.runningdinner.main.core;
 
-import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
+import org.floric.runningdinner.util.ILogOutput;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
+import java.util.List;
 
 /** Class for logging.
  *
@@ -12,37 +13,37 @@ import java.time.format.DateTimeFormatter;
  */
 public class Logger {
 
-    private static Label statusLabel;
+    private static List<ILogOutput> observers = new LinkedList<>();
 
     public static void Log(LOG_VERBOSITY state, String message) {
         LocalDateTime currentTime = LocalDateTime.now();
 
         System.out.println("[" + state.toString() + " | " + currentTime.format(DateTimeFormatter.ofPattern("dd.MM.y HH:mm:ss")) + "] " + message);
 
-        if (statusLabel != null) {
-            switch (state) {
-                case INFO:
+        switch (state) {
+            case INFO:
 
 
-                    break;
-                case MAIN:
-                    statusLabel.setText(message);
-                    statusLabel.setTextFill(Color.WHITE);
+                break;
+            case MAIN:
+                displayLog(message, state);
 
-                    break;
-                case ERROR:
-                    statusLabel.setText(message);
-                    statusLabel.setTextFill(Color.valueOf("#D21544"));
+                break;
+            case ERROR:
+                displayLog(message, state);
 
-                    break;
-                default:
+                break;
+            default:
 
-            }
         }
     }
 
-    public static void setStatusLabel(Label l) {
-        statusLabel = l;
+    public static void addObserver(ILogOutput obj) {
+        observers.add(obj);
+    }
+
+    public static void displayLog(String message, LOG_VERBOSITY verbosity) {
+        observers.forEach(iLogOutput -> iLogOutput.updateLogOutput(message, verbosity));
     }
 
     public enum LOG_VERBOSITY {

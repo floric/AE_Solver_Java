@@ -37,6 +37,8 @@ public class Main extends Application {
 
         primaryStage.setTitle("Running Dinner");
         primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setMinWidth(400);
+        primaryStage.setMinHeight(600);
         primaryStage.show();
 
         // call exit from core on exit try

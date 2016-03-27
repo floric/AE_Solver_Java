@@ -1,7 +1,6 @@
 package org.floric.runningdinner.main.core;
 
-import javafx.geometry.Point2D;
-
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 /**
@@ -54,6 +53,6 @@ public class TeamGroup {
         double x = teams.stream().mapToDouble(value -> value.getLocation().getX()).average().getAsDouble();
         double y = teams.stream().mapToDouble(value -> value.getLocation().getY()).average().getAsDouble();
 
-        return new Point2D(x, y);
+        return new Point2D.Double(x, y);
     }
 }

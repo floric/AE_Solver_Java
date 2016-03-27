@@ -6,12 +6,11 @@ import org.floric.runningdinner.main.base.IObserver;
 import org.floric.runningdinner.main.base.IPersistent;
 import org.floric.runningdinner.util.DataGenerator;
 import org.floric.runningdinner.util.DataWriterReader;
+import org.reactfx.util.FxTimer;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /** Core class
@@ -29,23 +28,26 @@ public class Core implements IPersistent, IObservable {
     public final static int SEED_MAX = 1000;
     public final static int SEED_DEFAULT = 1;
 
+    public final static int SAFE_DELAY_SEC = 10;
+    public final static int DISPLAY_DURATION_SEC = 3;
+
     public final static String SAFE_EXTENSION = "rdsv";
     public final static String SAFE_FILENAME = "rdsafe";
 
     private static Core core = null;
 
     private DataGenerator dataGen = new DataGenerator(TEAMS_DEFAULT, SEED_DEFAULT);
-
     private Map<Integer, Team> teams = new HashMap<>();
     private Map<Integer, TeamGroup> groups = new HashMap<>();
-
     private String safeDir = new String(System.getProperty("user.home"));
-
     private List<IObserver> observers = new LinkedList<>();
+    private boolean needsSafe = true;
+    private boolean isCurrentlySaving = false;
+    private Timer safeTimer = new Timer("Safetimer");
 
     private Core() {
         // basic group for every new team
-        Init();
+        init();
     }
 
     // use Singleton pattern
@@ -57,9 +59,24 @@ public class Core implements IPersistent, IObservable {
         return core;
     }
 
-    private void Init() {
+    private void init() {
         groups.put(0, new TeamGroup());
+
+        FxTimer.runPeriodically(
+                Duration.ofSeconds(SAFE_DELAY_SEC),
+                () -> checkSafeState());
+
         Logger.Log(Logger.LOG_VERBOSITY.INFO, "Core initialized.");
+    }
+
+    private void checkSafeState() {
+        if (needsSafe()) {
+            writeSafeFile();
+
+            needsSafe = false;
+        }
+
+        //EventStreams.ticks(Duration.ofSeconds(5)).subscribe(tick -> Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Test"));
     }
 
     public void addObserver(IObserver obj) {
@@ -86,6 +103,8 @@ public class Core implements IPersistent, IObservable {
         groups.get(0).addTeam(t);
         teams.put(t.getTeamIndex(), t);
 
+        setToDirtySafeState();
+
         notifyObservers();
     }
 
@@ -93,7 +112,10 @@ public class Core implements IPersistent, IObservable {
         teams.remove(t.getTeamIndex());
         t.getCurrentGroup().removeTeam(t);
 
+        setToDirtySafeState();
+
         notifyObservers();
+
         return true;
     }
 
@@ -119,6 +141,13 @@ public class Core implements IPersistent, IObservable {
         return groups.values().stream().filter(teamGroup -> teamGroup.getTeams().size() > 0).collect(Collectors.toList());
     }
 
+    public List<Team> getTeams() {
+        List<Team> teams = new LinkedList<>();
+        groups.values().forEach(teamGroup -> teams.addAll(teamGroup.getTeams()));
+
+        return teams;
+    }
+
     public int getTeamGroupIndex(TeamGroup t) {
         return groups.entrySet().stream().filter(integerTeamGroupEntry -> integerTeamGroupEntry.getValue() == t).findFirst().get().getKey();
     }
@@ -136,22 +165,43 @@ public class Core implements IPersistent, IObservable {
         notifyObservers();
     }
 
-    public void Reset() {
+    public boolean needsSafe() {
+        return needsSafe;
+    }
+
+    public void setToDirtySafeState() {
+        if (!needsSafe()) {
+            Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Safe needed!");
+            this.needsSafe = true;
+
+            notifyObservers();
+        }
+    }
+
+    public void reset() {
         teams.clear();
         groups.clear();
 
-        Init();
+        init();
 
         notifyObservers();
     }
 
     public void exit() {
-        Logger.Log(Logger.LOG_VERBOSITY.INFO, "Exit.");
-        Platform.exit();
+        if (!isCurrentlySaving) {
+            safeTimer.cancel();
+            Platform.exit();
+
+            Logger.Log(Logger.LOG_VERBOSITY.INFO, "Exit.");
+        } else {
+            Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Currently saving!");
+        }
     }
 
     public void writeSafeFile() {
         DataWriterReader dataRW = new DataWriterReader();
+
+        isCurrentlySaving = true;
 
         // add core and static items for saving
         dataRW.addObject(this);
@@ -159,6 +209,9 @@ public class Core implements IPersistent, IObservable {
 
         try {
             dataRW.writeFile(getSafePath());
+
+            needsSafe = false;
+            isCurrentlySaving = false;
 
             Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Safe successfull.");
         } catch (IOException e) {
@@ -170,6 +223,7 @@ public class Core implements IPersistent, IObservable {
         DataWriterReader dataRW = new DataWriterReader();
         try {
             dataRW.readFile(getSafePath());
+            checkSafeState();
 
             Logger.Log(Logger.LOG_VERBOSITY.INFO, "Safefile successfully read.");
         } catch (IOException e) {
@@ -191,4 +245,5 @@ public class Core implements IPersistent, IObservable {
     public String getType() {
         return "Core";
     }
+
 }

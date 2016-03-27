@@ -86,9 +86,9 @@ public class DataWriterReader {
                 } else if(foundIdentifier.compareTo("Core") == 0) {
                     //Core.getInstance().setSafeDir();
 
-                    Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Read Core");
+                    Logger.Log(Logger.LOG_VERBOSITY.INFO, "Read Core");
                 } else {
-                    Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Unknown file type!");
+                    Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Unknown file type in safefile!");
                 }
             }
         }

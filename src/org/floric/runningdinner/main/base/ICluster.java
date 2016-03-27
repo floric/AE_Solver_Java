@@ -1,9 +1,8 @@
 package org.floric.runningdinner.main.base;
 
-import javafx.geometry.Point2D;
 import org.floric.runningdinner.main.core.Team;
-import org.floric.runningdinner.main.core.TeamGroup;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 /**

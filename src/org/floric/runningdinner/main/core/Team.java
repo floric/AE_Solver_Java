@@ -1,8 +1,8 @@
 package org.floric.runningdinner.main.core;
 
-import javafx.geometry.Point2D;
 import org.floric.runningdinner.main.base.IPersistent;
 
+import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +17,9 @@ public class Team implements IPersistent {
     private Person pA;
     private Person pB;
     private int teamIndex;
-    private Point2D location = Point2D.ZERO;
+
+    private String address = "Street, City";
+    private Point2D location = new Point2D.Double(0, 0);
 
     public Team(Person pA, Person pB) {
         if (pA == null || pB == null) {
@@ -29,11 +31,23 @@ public class Team implements IPersistent {
         this.pB = pB;
 
         Core.getInstance().addTeam(this);
-        Core.getInstance().writeSafeFile();
+        Core.getInstance().setToDirtySafeState();
     }
 
     public static int getNextIndex() {
         return countingTeamIndex++;
+    }
+
+    public static Point2D getMinLocation(List<Team> teams) {
+        Point2D min = new Point2D.Double(teams.stream().mapToDouble(value -> value.getLocation().getX()).min().getAsDouble(),
+                teams.stream().mapToDouble(value -> value.getLocation().getY()).min().getAsDouble());
+        return min;
+    }
+
+    public static Point2D getMaxLocation(List<Team> teams) {
+        Point2D min = new Point2D.Double(teams.stream().mapToDouble(value -> value.getLocation().getX()).max().getAsDouble(),
+                teams.stream().mapToDouble(value -> value.getLocation().getY()).max().getAsDouble());
+        return min;
     }
 
     public int getTeamIndex() {
@@ -46,7 +60,7 @@ public class Team implements IPersistent {
 
     public void setLocation(Point2D location) {
         this.location = location;
-        Core.getInstance().writeSafeFile();
+        Core.getInstance().setToDirtySafeState();
     }
 
     public Person getPersonA() {
@@ -55,6 +69,16 @@ public class Team implements IPersistent {
 
     public Person getPersonB() {
         return pB;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+
+        Core.getInstance().setToDirtySafeState();
     }
 
     public int getGroupIndex() {
@@ -83,9 +107,11 @@ public class Team implements IPersistent {
 
         objs.add(getPersonA().toString());
         objs.add(getPersonB().toString());
+        objs.add(getAddress());
         objs.add(String.valueOf(getLocation().getX()));
         objs.add(String.valueOf(getLocation().getY()));
 
         return objs;
     }
+
 }

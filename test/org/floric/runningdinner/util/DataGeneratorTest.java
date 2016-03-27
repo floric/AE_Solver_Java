@@ -1,18 +1,19 @@
 package org.floric.runningdinner.util;
 
-import javafx.geometry.Point2D;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.awt.geom.Point2D;
 
 /**
  * Created by florian on 28.02.2016.
  */
 public class DataGeneratorTest {
 
-    private DataGenerator dg;
     private static int TEAM_COUNT = 9;
-    private static Point2D POINT_MIN = new Point2D(-10, -10);
-    private static Point2D POINT_MAX = new Point2D(10, 10);
+    private static Point2D POINT_MIN = new Point2D.Double(-10, -10);
+    private static Point2D POINT_MAX = new Point2D.Double(10, 10);
+    private DataGenerator dg;
 
     @Before
     public void init() {

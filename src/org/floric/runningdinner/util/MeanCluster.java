@@ -1,12 +1,11 @@
 package org.floric.runningdinner.util;
 
-import javafx.geometry.Point2D;
 import org.floric.runningdinner.main.base.ICluster;
+import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Team;
 import org.floric.runningdinner.main.core.TeamGroup;
-import org.floric.runningdinner.main.core.Core;
 
-import java.lang.reflect.Array;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 
@@ -15,10 +14,10 @@ import java.util.stream.IntStream;
  */
 public class MeanCluster implements ICluster {
 
+    private static final int ITERATIONS = 10;
     private ArrayList<Team> teams = new ArrayList<>();
     private ArrayList<TeamGroup> clusters = new ArrayList<>();
     private ArrayList<Point2D> centers = new ArrayList<>();
-    private static final int ITERATIONS = 10;
 
     public MeanCluster() {
 
@@ -37,18 +36,12 @@ public class MeanCluster implements ICluster {
             throw new IllegalArgumentException("At least 1 center for clustering needed!");
         }
 
-        // find min / max of teams for random center borders
-        Point2D min = new Point2D(teams.stream().mapToDouble(value -> value.getLocation().getX()).min().getAsDouble(),
-                teams.stream().mapToDouble(value -> value.getLocation().getY()).min().getAsDouble());
-        Point2D max = new Point2D(teams.stream().mapToDouble(value -> value.getLocation().getX()).max().getAsDouble(),
-                teams.stream().mapToDouble(value -> value.getLocation().getY()).max().getAsDouble());
-
         double minTotalDistance = Double.POSITIVE_INFINITY;
         int iterations = 0;
 
         // set random centers for every cluster in min/max range
         IntStream.range(0, expectedClasses).forEach(centerIndex -> {
-            centers.add(c.getDataGenerator().getRandomPoint(min, max));
+            centers.add(c.getDataGenerator().getRandomPoint(Team.getMinLocation(teams), Team.getMaxLocation(teams)));
         });
 
 
@@ -66,9 +59,6 @@ public class MeanCluster implements ICluster {
 
             // calculate total distance to centers for every team
             double totalDistance = 0.0;
-
-
-
 
             iterations++;
         }

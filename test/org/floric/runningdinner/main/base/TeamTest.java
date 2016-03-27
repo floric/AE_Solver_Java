@@ -1,12 +1,13 @@
 package org.floric.runningdinner.main.base;
 
-import javafx.geometry.Point2D;
 import org.floric.runningdinner.main.core.Person;
 import org.floric.runningdinner.main.core.Team;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.awt.geom.Point2D;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by florian on 28.02.2016.
@@ -35,12 +36,12 @@ public class TeamTest {
 
     @Test
     public void testGetLocation() throws Exception {
-        assertEquals(Point2D.ZERO, t.getLocation());
+        assertEquals(new Point2D.Double(0, 0), t.getLocation());
     }
 
     @Test
     public void testSetLocation() throws Exception {
-        Point2D newLocation = new Point2D(1.0, 2.0);
+        Point2D newLocation = new Point2D.Double(1.0, 2.0);
         t.setLocation(newLocation);
         assertEquals(newLocation, t.getLocation());
     }

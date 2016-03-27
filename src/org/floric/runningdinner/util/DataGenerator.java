@@ -1,11 +1,11 @@
 package org.floric.runningdinner.util;
 
-import javafx.geometry.Point2D;
-import org.floric.runningdinner.main.core.Person;
-import org.floric.runningdinner.main.core.Team;
 import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
+import org.floric.runningdinner.main.core.Person;
+import org.floric.runningdinner.main.core.Team;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,8 +15,8 @@ import java.util.Random;
 public class DataGenerator {
 
     private static int COORD_MULTIPLY = 10;
-    private static Point2D COORD_MIN = new Point2D(0.0, 0.0);
-    private static Point2D COORD_MAX = new Point2D(100.0, 100.0);
+    private static Point2D COORD_MIN = new Point2D.Double(0.0, 0.0);
+    private static Point2D COORD_MAX = new Point2D.Double(100.0, 100.0);
     private int teamCount = 0;
     private Random rand;
 
@@ -33,11 +33,11 @@ public class DataGenerator {
     }
 
     public Point2D getRandomPoint(Point2D min, Point2D max) {
-        return new Point2D(rand.nextDouble() * (max.getX() + min.getX()), rand.nextDouble() * (max.getY() + min.getY()));
+        return new Point2D.Double(rand.nextDouble() * (max.getX() + min.getX()), rand.nextDouble() * (max.getY() + min.getY()));
     }
 
     public Point2D getRandomPoint() {
-        return new Point2D(rand.nextDouble() * (COORD_MAX.getX() + COORD_MIN.getX()), rand.nextDouble() * (COORD_MAX.getY() + COORD_MIN.getY()));
+        return new Point2D.Double(rand.nextDouble() * (COORD_MAX.getX() + COORD_MIN.getX()), rand.nextDouble() * (COORD_MAX.getY() + COORD_MIN.getY()));
     }
 
     public void changeSeed(long seed) {

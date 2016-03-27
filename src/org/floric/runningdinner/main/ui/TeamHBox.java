@@ -1,7 +1,6 @@
 package org.floric.runningdinner.main.ui;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -12,18 +11,18 @@ import org.floric.runningdinner.main.core.Logger;
 import org.floric.runningdinner.main.core.Person;
 import org.floric.runningdinner.main.core.Team;
 
+import java.awt.geom.Point2D;
+
 /**
  * Created by florian on 06.03.2016.
  */
 public class TeamHBox extends HBox {
 
     private Label teamIndexLabel = new Label("0");
-    private Label namesLabel = new Label("Names");
-    private Label coordsLabel = new Label("Coordinates");
-    private Label namesAndLabel = new Label("&");
 
-    private TextField namesOneTextField = new TextField("Name 1, Vorname 1");
-    private TextField namesTwoTextField = new TextField("Name 2, Vorname 2");
+    private TextField namesOneTextField = new TextField("Name 1, Forename 1");
+    private TextField namesTwoTextField = new TextField("Name 2, Forename 2");
+    private TextField addressTextField = new TextField("Street, City");
     private TextField coordinatesTextField = new TextField("0.0, 0.0");
     private Button deleteTeamButton = new Button("Delete team");
 
@@ -34,11 +33,13 @@ public class TeamHBox extends HBox {
 
         // add elements to box
         boxChildren.add(teamIndexLabel);
-        boxChildren.add(namesLabel);
+        boxChildren.add(new Label("Names"));
         boxChildren.add(namesOneTextField);
-        boxChildren.add(namesAndLabel);
+        boxChildren.add(new Label("&"));
         boxChildren.add(namesTwoTextField);
-        boxChildren.add(coordsLabel);
+        boxChildren.add(new Label("Address"));
+        boxChildren.add(addressTextField);
+        boxChildren.add(new Label("Coordinates"));
         boxChildren.add(coordinatesTextField);
         boxChildren.add(deleteTeamButton);
 
@@ -52,6 +53,7 @@ public class TeamHBox extends HBox {
         teamIndexLabel.setText(String.valueOf(assignedTeam.getTeamIndex()));
         namesOneTextField.setText(t.getPersonA().toString());
         namesTwoTextField.setText(t.getPersonB().toString());
+        addressTextField.setText(t.getAddress());
         coordinatesTextField.setText(t.getLocation().getX() + ", " + t.getLocation().getY());
 
         addListeners();
@@ -59,34 +61,6 @@ public class TeamHBox extends HBox {
 
     public Button getDeleteButton() {
         return deleteTeamButton;
-    }
-
-    public String getPersonOne() {
-        return namesOneTextField.getText();
-    }
-
-    public void setPersonOne(String name) {
-        namesOneTextField.setText(name);
-    }
-
-    public String getPersonTwo() {
-        return namesTwoTextField.getText();
-    }
-
-    public void setPersonTwo(String name) {
-        namesTwoTextField.setText(name);
-    }
-
-    public String getAddress() {
-        return coordinatesTextField.getText();
-    }
-
-    public void setCoordinates(String address) {
-        coordinatesTextField.setText(address);
-    }
-
-    public int getTeamIndex() {
-        return Integer.valueOf(teamIndexLabel.getText());
     }
 
     public Team getAssignedTeam() {
@@ -100,7 +74,7 @@ public class TeamHBox extends HBox {
         namesOneTextField.focusedProperty().addListener((field, oldValue, newValue) -> {
             if (!newValue) {
                 Person pA = assignedTeam.getPersonA();
-                pA.formatCommaInput(namesOneTextField.getText());
+                pA.formatCommaInput(namesOneTextField.getText(), true);
                 namesOneTextField.setText(pA.getLastName() + ", " + pA.getFirstName());
             }
         });
@@ -108,8 +82,14 @@ public class TeamHBox extends HBox {
         namesTwoTextField.focusedProperty().addListener((field, oldValue, newValue) -> {
             if (!newValue) {
                 Person pB = assignedTeam.getPersonB();
-                pB.formatCommaInput(namesTwoTextField.getText());
+                pB.formatCommaInput(namesTwoTextField.getText(), true);
                 namesTwoTextField.setText(pB.getLastName() + ", " + pB.getFirstName());
+            }
+        });
+
+        addressTextField.focusedProperty().addListener((field, oldValue, newValue) -> {
+            if (!newValue) {
+                assignedTeam.setAddress(addressTextField.getText());
             }
         });
 
@@ -121,9 +101,9 @@ public class TeamHBox extends HBox {
 
                 // validate input
                 try {
-                    assignedTeam.setLocation(new Point2D(Double.valueOf(parts[0]), Double.valueOf(parts[1])));
+                    assignedTeam.setLocation(new Point2D.Double(Double.valueOf(parts[0]), Double.valueOf(parts[1])));
                 } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex2) {
-                    assignedTeam.setLocation(new Point2D(0, 0));
+                    assignedTeam.setLocation(new Point2D.Double(0, 0));
                     Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Invalid coordinates format!");
                 }
 
