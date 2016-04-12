@@ -79,17 +79,14 @@ public class MeanCluster implements ICluster {
                     c.setTeamToGroup(currentTeam, -1);
 
                     // calculate old variance
-                    //double oldVariance = currentGroup.getTeams().stream().mapToDouble(t -> t.getLocation().distanceSq(centerPt)).average().orElse(0);
                     double oldVariance = currentGroup.getVariance(centerPt);
 
                     // set team to other group
                     c.setTeamToGroup(currentTeam, centerIndex);
 
                     // calculate changed variance
-                    //double newVariance = currentGroup.getTeams().stream().mapToDouble(t -> t.getLocation().distanceSq(centerPt)).average().orElse(0);
                     double centerDistance = centerPt.distance(currentTeam.getLocation());
 
-                    //varianceDiff.put(centerIndex, Math.abs(newVariance - oldVariance));
                     varianceDiff.put(centerIndex, Math.abs(centerDistance));
 
                     // set team back to old group
@@ -131,7 +128,7 @@ public class MeanCluster implements ICluster {
 
         Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Finished clustering after " + iterations + " iterations!");
         c.getTeamGroups().forEach(tg -> {
-            Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Group " + tg.getGroupIndex() + " has " + tg.getTeams().size() + " teams assigned!");
+            Logger.Log(Logger.LOG_VERBOSITY.INFO, "Group " + tg.getGroupIndex() + " has " + tg.getTeams().size() + " teams assigned!");
         });
 
         Core.getInstance().notifyObservers();

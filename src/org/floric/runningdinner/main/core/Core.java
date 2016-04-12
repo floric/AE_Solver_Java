@@ -1,6 +1,7 @@
 package org.floric.runningdinner.main.core;
 
 import javafx.application.Platform;
+import javafx.util.Pair;
 import org.floric.runningdinner.main.base.IObservable;
 import org.floric.runningdinner.main.base.IObserver;
 import org.floric.runningdinner.main.base.IPersistent;
@@ -8,6 +9,7 @@ import org.floric.runningdinner.util.DataGenerator;
 import org.floric.runningdinner.util.DataWriterReader;
 import org.reactfx.util.FxTimer;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -222,6 +224,16 @@ public class Core implements IPersistent, IObservable {
         }
 
         notifyObservers();
+    }
+
+    public Pair<Double, Double>[] getCoordinates() {
+        Pair<Double, Double>[] coords = new Pair[getTeams().size()];
+        for (int i = 0; i < getTeams().size(); i++) {
+            Point2D c = getTeams().get(i).getLocation();
+            coords[i] = new Pair<>(c.getX(), c.getY());
+        }
+
+        return coords;
     }
 
     @Override

@@ -18,7 +18,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.floric.runningdinner.main.base.ICluster;
 import org.floric.runningdinner.main.base.IObserver;
+import org.floric.runningdinner.main.base.ISolver;
 import org.floric.runningdinner.main.core.*;
+import org.floric.runningdinner.main.solvers.NaiveSolver;
 import org.floric.runningdinner.util.GuiUtil;
 import org.floric.runningdinner.util.ILogOutput;
 import org.floric.runningdinner.util.MeanCluster;
@@ -49,6 +51,8 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
     private Button addRandomTeamsButton;
     @FXML
     private Button clearTeamsButton;
+    @FXML
+    private Button distributeButton;
 
     @FXML
     private MenuItem exitMenuItem;
@@ -102,7 +106,9 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
         Core c = Core.getInstance();
 
         ICluster cluster = new MeanCluster();
-        int neededClasses = (int) Math.floor((double) c.getTeams().size() / 9);
+        int neededClasses = (int) Math.ceil((double) c.getTeams().size() / 27);
+        Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Cluster " + c.getTeams().size() + " teams in " + neededClasses + " classes!");
+
         cluster.clusterPoints(neededClasses, c.getTeams(), true);
         usedCenters = cluster.getCenters();
 
@@ -183,6 +189,17 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
     @FXML
     protected void clearTeamsClicked(MouseEvent event) {
         Core.getInstance().reset();
+    }
+
+    @FXML
+    protected void calculateDistributionClicked(MouseEvent event) {
+        if (Core.getInstance().getTeamGroup(-1).getTeams().size() > 0) {
+            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Not all teams are grouped. Please cluster new!");
+            return;
+        }
+
+        ISolver solver = new NaiveSolver();
+        solver.calcSolution(Core.getInstance().getCoordinates());
     }
 
     @FXML
