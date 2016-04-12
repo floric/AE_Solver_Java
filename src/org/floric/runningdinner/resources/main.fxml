@@ -42,7 +42,7 @@
     <center>
         <Accordion BorderPane.alignment="CENTER">
             <panes>
-                <TitledPane animated="false" contentDisplay="CENTER" text="TEAMS">
+                <TitledPane fx:id="teamsPane" animated="false" contentDisplay="CENTER" text="TEAMS">
                <content>
                   <ScrollPane>
                     <content>
@@ -84,7 +84,7 @@
                   </ScrollPane>
                </content>
                 </TitledPane>
-                <TitledPane animated="false" text="COORDINATES">
+                <TitledPane fx:id="coordsPane" animated="false" text="COORDINATES">
                     <content>
                         <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                             <children>
@@ -102,7 +102,7 @@
                         </VBox>
                     </content>
                 </TitledPane>
-                <TitledPane animated="false" text="DISTRIBUTION">
+                <TitledPane fx:id="distributionPane" animated="false" text="DISTRIBUTION">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                     </content>

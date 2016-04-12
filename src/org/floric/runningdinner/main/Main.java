@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
-import org.floric.runningdinner.main.ui.MainController;
 
 public class Main extends Application {
 
@@ -27,13 +26,6 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("../resources/main.fxml"));
         Parent root = loader.load();
-        MainController mainCtrl = loader.getController();
-
-        if (mainCtrl != null) {
-            c.addObserver(mainCtrl);
-        } else {
-            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Controller couldn't be found!");
-        }
 
         primaryStage.setTitle("Running Dinner");
         primaryStage.setScene(new Scene(root, 800, 600));

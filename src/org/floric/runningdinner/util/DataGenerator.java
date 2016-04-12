@@ -40,6 +40,10 @@ public class DataGenerator {
         return new Point2D.Double(rand.nextDouble() * (COORD_MAX.getX() + COORD_MIN.getX()), rand.nextDouble() * (COORD_MAX.getY() + COORD_MIN.getY()));
     }
 
+    public int getNextIndex(int min, int max) {
+        return rand.nextInt(max - min) - min;
+    }
+
     public void changeSeed(long seed) {
         rand.setSeed(seed);
     }

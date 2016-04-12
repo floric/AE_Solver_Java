@@ -5,11 +5,14 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import org.floric.runningdinner.main.core.Core;
 import org.floric.runningdinner.main.core.Logger;
 import org.floric.runningdinner.main.core.Person;
 import org.floric.runningdinner.main.core.Team;
+import org.floric.runningdinner.util.GuiUtil;
 
 import java.awt.geom.Point2D;
 
@@ -24,6 +27,7 @@ public class TeamHBox extends HBox {
     private TextField namesTwoTextField = new TextField("Name 2, Forename 2");
     private TextField addressTextField = new TextField("Street, City");
     private TextField coordinatesTextField = new TextField("0.0, 0.0");
+    private Spinner<Integer> teamIndexSpinner = new Spinner<>();
     private Button deleteTeamButton = new Button("Delete team");
 
     private Team assignedTeam;
@@ -39,24 +43,25 @@ public class TeamHBox extends HBox {
         boxChildren.add(namesTwoTextField);
         boxChildren.add(new Label("Address"));
         boxChildren.add(addressTextField);
-        boxChildren.add(new Label("Coordinates"));
+        boxChildren.add(new Label("Position"));
         boxChildren.add(coordinatesTextField);
+        boxChildren.add(new Label("Group"));
+        boxChildren.add(teamIndexSpinner);
         boxChildren.add(deleteTeamButton);
+
+        // set values for group index spinner
+        GuiUtil.initSpinner(teamIndexSpinner, 0, 99, 0, 1);
 
         // layout properties
         teamIndexLabel.setMinWidth(20);
         this.setSpacing(10);
-
         setAlignment(Pos.CENTER_LEFT);
 
         assignedTeam = t;
-        teamIndexLabel.setText(String.valueOf(assignedTeam.getTeamIndex()));
-        namesOneTextField.setText(t.getPersonA().toString());
-        namesTwoTextField.setText(t.getPersonB().toString());
-        addressTextField.setText(t.getAddress());
-        coordinatesTextField.setText(t.getLocation().getX() + ", " + t.getLocation().getY());
 
         addListeners();
+
+        setContent();
     }
 
     public Button getDeleteButton() {
@@ -110,5 +115,19 @@ public class TeamHBox extends HBox {
                 coordinatesTextField.setText(assignedTeam.getLocation().getX() + ", " + assignedTeam.getLocation().getY());
             }
         });
+
+        deleteTeamButton.setOnMouseClicked(b -> {
+            Core.getInstance().removeTeam(assignedTeam);
+        });
+    }
+
+    public void setContent() {
+        teamIndexLabel.setText(String.valueOf(assignedTeam.getTeamIndex()));
+        namesOneTextField.setText(assignedTeam.getPersonA().toString());
+        namesTwoTextField.setText(assignedTeam.getPersonB().toString());
+        addressTextField.setText(assignedTeam.getAddress());
+        coordinatesTextField.setText(assignedTeam.getLocation().getX() + ", " + assignedTeam.getLocation().getY());
+        teamIndexSpinner.valueFactoryProperty().get().setValue(assignedTeam.getGroupIndex());
+        teamIndexLabel.setTextFill(assignedTeam.getCurrentGroup().getColor());
     }
 }

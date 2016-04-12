@@ -1,37 +1,35 @@
 package org.floric.runningdinner.main.core;
 
+import javafx.scene.paint.Color;
+
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by florian on 28.02.2016.
  */
 public class TeamGroup {
 
-    private ArrayList<Team> teams = new ArrayList<>();
+    private Set<Team> teams = new HashSet<>();
+    private int groupIndex = 0;
+    private Color col = new Color(0.0, 0.0, 0.0, 1.0);
 
-    public TeamGroup() {
-
+    public TeamGroup(int groupIndex) {
+        this.groupIndex = groupIndex;
     }
 
     public int getGroupIndex() {
-        Core c = Core.getInstance();
-
-        return 0;
+        return groupIndex;
     }
 
-    public ArrayList<Team> getTeams() {
+    public Set<Team> getTeams() {
         return teams;
     }
 
     protected void addTeam(Team t) {
         if (t != null) {
-            int teamIndex = teams.indexOf(t);
-            if(teamIndex != -1) {
-                teams.set(teamIndex, t);
-            } else {
-                teams.add(t);
-            }
+            teams.add(t);
         } else {
             throw new IllegalArgumentException();
         }
@@ -54,5 +52,17 @@ public class TeamGroup {
         double y = teams.stream().mapToDouble(value -> value.getLocation().getY()).average().getAsDouble();
 
         return new Point2D.Double(x, y);
+    }
+
+    public double getVariance(Point2D centerPt) {
+        return 0;
+    }
+
+    public Color getColor() {
+        return col;
+    }
+
+    public void setColor(Color c) {
+        col = c;
     }
 }

@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import org.floric.runningdinner.main.base.ICluster;
 import org.floric.runningdinner.main.base.IObserver;
 import org.floric.runningdinner.main.core.*;
+import org.floric.runningdinner.util.GuiUtil;
 import org.floric.runningdinner.util.ILogOutput;
 import org.floric.runningdinner.util.MeanCluster;
 import org.reactfx.util.FxTimer;
@@ -28,9 +29,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable, Closeable, IObserver, ILogOutput {
 
@@ -73,12 +72,23 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
     @FXML
     private TextField seedTextField;
 
+    @FXML
+    private TitledPane teamsPane;
+    @FXML
+    private TitledPane coordsPane;
+    @FXML
+    private TitledPane distributionPane;
+
+    private List<Point2D> usedCenters = new LinkedList<>();
+    private Map<Team, TeamHBox> knownTeams = new HashMap<>();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Logger.addObserver(this);
+        Core.getInstance().addObserver(this);
 
-        initSpinner(randomTeamsCountSpinner, Core.TEAMS_MIN, Core.TEAMS_MAX, Core.TEAMS_DEFAULT, 1);
-        initSpinner(randomSeedSpinner, Core.SEED_MIN, Core.SEED_MAX, Core.SEED_DEFAULT, 1);
+        GuiUtil.initSpinner(randomTeamsCountSpinner, Core.TEAMS_MIN, Core.TEAMS_MAX, Core.TEAMS_DEFAULT, 1);
+        GuiUtil.initSpinner(randomSeedSpinner, Core.SEED_MIN, Core.SEED_MAX, Core.SEED_DEFAULT, 1);
 
         gc = coordinatesCanvas.getGraphicsContext2D();
 
@@ -91,35 +101,57 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
     protected void groupTeamsClicked(MouseEvent event) {
         Core c = Core.getInstance();
 
-        ArrayList<Team> allTeams = new ArrayList<>();
-        c.getTeamsGroups().forEach(teamGroup -> allTeams.addAll(teamGroup.getTeams()));
-
         ICluster cluster = new MeanCluster();
-        cluster.clusterPoints(3, allTeams);
+        int neededClasses = (int) Math.floor((double) c.getTeams().size() / 9);
+        cluster.clusterPoints(neededClasses, c.getTeams(), true);
+        usedCenters = cluster.getCenters();
 
         drawTeamGroups();
+        Core.getInstance().notifyObservers();
     }
 
     private void drawTeamGroups() {
-        List<TeamGroup> clusteredPoints = Core.getInstance().getTeamsGroups();
-        Point2D min = Team.getMinLocation(Core.getInstance().getTeams());
-        Point2D max = Team.getMaxLocation(Core.getInstance().getTeams());
+        List<Team> usedTeams = Core.getInstance().getTeams();
+        if (usedTeams.isEmpty()) {
+            return;
+        }
 
+        List<TeamGroup> clusteredPoints = Core.getInstance().getTeamGroups();
+        Point2D min = Team.getMinLocation(usedTeams);
+        Point2D max = Team.getMaxLocation(usedTeams);
+        Point2D canvasSize = new Point2D.Double(canvasPane.getWidth() - 2 * CANVAS_PADDING, canvasPane.getHeight() - 2 * CANVAS_PADDING);
+
+        // clear canvas
         gc.clearRect(0, 0, canvasPane.getWidth(), canvasPane.getHeight());
+
+        // draw centers
+        for (Point2D pt : usedCenters) {
+            Point2D leftBottom = transformCoordinatesToCanvas(min, max, new Point2D.Double(pt.getX() - 1, pt.getY() + 1), canvasSize);
+            Point2D leftTop = transformCoordinatesToCanvas(min, max, new Point2D.Double(pt.getX() - 1, pt.getY() - 1), canvasSize);
+            Point2D rightBottom = transformCoordinatesToCanvas(min, max, new Point2D.Double(pt.getX() + 1, pt.getY() + 1), canvasSize);
+            Point2D rightTop = transformCoordinatesToCanvas(min, max, new Point2D.Double(pt.getX() + 1, pt.getY() - 1), canvasSize);
+
+            gc.strokeLine(leftBottom.getX(), leftBottom.getY(), rightTop.getX(), rightTop.getY());
+            gc.strokeLine(leftTop.getX(), leftTop.getY(), rightBottom.getX(), rightBottom.getY());
+        }
 
         // draw points for every teamgroup
         for(int i = 0; i < clusteredPoints.size(); i++) {
             TeamGroup tg = clusteredPoints.get(i);
-            ArrayList<Team> teams = tg.getTeams();
+            Set<Team> teams = tg.getTeams();
+
+            // set color
+            float colorAngle = i * 360.0f / clusteredPoints.size();
+            tg.setColor(Color.hsb(colorAngle, 1.0, 1.0));
 
             for(Team t: teams) {
-                float colorAngle = i * 360.0f / clusteredPoints.size();
-
-                Point2D screenCoords = transformCoordinatesToCanvas(min, max, t.getLocation(), new Point2D.Double(canvasPane.getWidth() - 2 * CANVAS_PADDING, canvasPane.getHeight() - 2 * CANVAS_PADDING));
+                Point2D screenCoords = transformCoordinatesToCanvas(min, max, t.getLocation(), canvasSize);
 
                 // draw point
-                gc.setFill(Color.hsb(colorAngle, 1.0, 1.0));
-                gc.fillOval(screenCoords.getX() + CANVAS_PADDING, screenCoords.getY() + CANVAS_PADDING, CANVAS_POINT_SIZE, CANVAS_POINT_SIZE);
+                gc.setFill(tg.getColor());
+                gc.fillOval(screenCoords.getX(), screenCoords.getY(), CANVAS_POINT_SIZE, CANVAS_POINT_SIZE);
+                gc.setFill(Color.BLACK);
+                gc.fillText(String.valueOf(t.getTeamIndex()), screenCoords.getX(), screenCoords.getY());
             }
         }
     }
@@ -131,8 +163,8 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
         double yRatio = (canvasSize.getY() - min.getY()) / boundingDistance.getY();
         double scaleFactor = xRatio < yRatio ? xRatio : yRatio;
 
-        double x = (point.getX() - min.getX()) * scaleFactor;
-        double y = (point.getY() - min.getY()) * scaleFactor;
+        double x = (point.getX() - min.getX()) * scaleFactor + CANVAS_PADDING;
+        double y = (point.getY() - min.getY()) * scaleFactor + CANVAS_PADDING;
 
         return new Point2D.Double(x, y);
     }
@@ -144,7 +176,7 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
 
         for (int i = 0; i < randomTeamsCountSpinner.getValue(); i++) {
             Team t = c.getDataGenerator().getRandomTeam();
-            Core.getInstance().addTeam(t);
+            c.addTeam(t);
         }
     }
 
@@ -157,37 +189,6 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
     protected void addTeamSlot(MouseEvent event) {
         Core.getInstance().addTeam(new Team(new Person(), new Person()));
         Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot added!");
-    }
-
-    private void addTeamSlot(Team t) {
-        TeamHBox teamBox = new TeamHBox(t);
-        teamsBox.getChildren().add(teamBox);
-
-        teamBox.getDeleteButton().setOnMouseClicked(event1 -> {
-            teamsBox.getChildren().remove(teamBox);
-            Core.getInstance().removeTeam(teamBox.getAssignedTeam());
-            Logger.Log(Logger.LOG_VERBOSITY.INFO, "Team slot deleted!");
-        });
-    }
-
-    private void initSpinner(Spinner<Integer> spinner, int min, int max, int def, int step) {
-        spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(min, max, def, step));
-        spinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            String currentInput = spinner.editorProperty().getValue().getText();
-            try {
-                int currentValue = Integer.parseInt(currentInput);
-
-                if (currentValue > max) {
-                    currentValue = max;
-                } else if (currentValue < min) {
-                    currentValue = min;
-                }
-
-                spinner.editorProperty().getValue().setText(String.valueOf(currentValue - (currentValue % step)));
-            } catch (NumberFormatException ex) {
-                spinner.editorProperty().getValue().setText(String.valueOf(def));
-            }
-        });
     }
 
     private void addListeners() {
@@ -211,7 +212,10 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
     }
 
     private void repaintCanvas() {
-        drawTeamGroups();
+        if (coordsPane.isExpanded()) {
+            drawTeamGroups();
+        }
+
     }
 
     @FXML
@@ -254,9 +258,12 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
         int currentTeamsSize = teamsBox.getChildren().size();
         teamsBox.getChildren().remove(2, currentTeamsSize);
 
-        List<TeamGroup> teamsGroups = Core.getInstance().getTeamsGroups();
+        List<TeamGroup> teamsGroups = Core.getInstance().getTeamGroups();
+
         for (TeamGroup tg : teamsGroups) {
-            tg.getTeams().forEach(this::addTeamSlot);
+            for (Team t : tg.getTeams()) {
+                teamsBox.getChildren().add(new TeamHBox(t));
+            }
         }
     }
 
@@ -277,9 +284,7 @@ public class MainController implements Initializable, Closeable, IObserver, ILog
         statusLabel.setText(text);
 
         // add timer to reset the text after DISPLAY_DURATION_SEC seconds
-        FxTimer.runLater(
-                Duration.ofSeconds(Core.DISPLAY_DURATION_SEC),
-                () -> statusLabel.setText(""));
+        FxTimer.runLater(Duration.ofSeconds(Core.DISPLAY_DURATION_SEC), () -> statusLabel.setText(""));
     }
 }
 

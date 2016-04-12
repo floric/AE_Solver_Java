@@ -37,7 +37,6 @@ public class Core implements IPersistent, IObservable {
     private static Core core = null;
 
     private DataGenerator dataGen = new DataGenerator(TEAMS_DEFAULT, SEED_DEFAULT);
-    private Map<Integer, Team> teams = new HashMap<>();
     private Map<Integer, TeamGroup> groups = new HashMap<>();
     private String safeDir = new String(System.getProperty("user.home"));
     private List<IObserver> observers = new LinkedList<>();
@@ -60,7 +59,7 @@ public class Core implements IPersistent, IObservable {
     }
 
     private void init() {
-        groups.put(0, new TeamGroup());
+        groups.put(-1, new TeamGroup(-1));
 
         FxTimer.runPeriodically(
                 Duration.ofSeconds(SAFE_DELAY_SEC),
@@ -75,8 +74,6 @@ public class Core implements IPersistent, IObservable {
 
             needsSafe = false;
         }
-
-        //EventStreams.ticks(Duration.ofSeconds(5)).subscribe(tick -> Logger.Log(Logger.LOG_VERBOSITY.ERROR, "Test"));
     }
 
     public void addObserver(IObserver obj) {
@@ -91,17 +88,8 @@ public class Core implements IPersistent, IObservable {
         return dataGen;
     }
 
-    public void setTeamGroup(TeamGroup t, int groupIndex) {
-        if (t == null) {
-            throw new IllegalArgumentException("Teamgroup null!");
-        }
-
-        groups.put(groupIndex, t);
-    }
-
     public void addTeam(Team t) {
-        groups.get(0).addTeam(t);
-        teams.put(t.getTeamIndex(), t);
+        getTeamGroup(-1).addTeam(t);
 
         setToDirtySafeState();
 
@@ -109,7 +97,6 @@ public class Core implements IPersistent, IObservable {
     }
 
     public boolean removeTeam(Team t) {
-        teams.remove(t.getTeamIndex());
         t.getCurrentGroup().removeTeam(t);
 
         setToDirtySafeState();
@@ -125,18 +112,25 @@ public class Core implements IPersistent, IObservable {
     }
 
     public TeamGroup getTeamGroup(int groupIndex) {
-        if(groups.containsKey(groupIndex)) {
+        long foundTeams = groups.keySet().stream().filter(integer -> integer == groupIndex).count();
 
-            return groups.get(groupIndex);
+        if (foundTeams > 1) {
+            Logger.Log(Logger.LOG_VERBOSITY.ERROR, "More then one time found for " + groupIndex + "!");
+        }
+
+        Optional<Map.Entry<Integer, TeamGroup>> teamOpt = groups.entrySet().stream().filter(t -> t.getKey() == groupIndex).findFirst();
+
+        if (teamOpt.isPresent()) {
+            return teamOpt.get().getValue();
         } else {
-            TeamGroup newGroup = new TeamGroup();
+            TeamGroup newGroup = new TeamGroup(groupIndex);
             groups.put(groupIndex, newGroup);
 
             return newGroup;
         }
     }
 
-    public List<TeamGroup> getTeamsGroups() {
+    public List<TeamGroup> getTeamGroups() {
         // only return groups with more then one team
         return groups.values().stream().filter(teamGroup -> teamGroup.getTeams().size() > 0).collect(Collectors.toList());
     }
@@ -149,7 +143,7 @@ public class Core implements IPersistent, IObservable {
     }
 
     public int getTeamGroupIndex(TeamGroup t) {
-        return groups.entrySet().stream().filter(integerTeamGroupEntry -> integerTeamGroupEntry.getValue() == t).findFirst().get().getKey();
+        return t.getGroupIndex();
     }
 
     public String getSafePath() {
@@ -173,13 +167,10 @@ public class Core implements IPersistent, IObservable {
         if (!needsSafe()) {
             Logger.Log(Logger.LOG_VERBOSITY.MAIN, "Safe needed!");
             this.needsSafe = true;
-
-            notifyObservers();
         }
     }
 
     public void reset() {
-        teams.clear();
         groups.clear();
 
         init();
@@ -205,7 +196,7 @@ public class Core implements IPersistent, IObservable {
 
         // add core and static items for saving
         dataRW.addObject(this);
-        teams.forEach((index, obj) -> dataRW.addObject(obj));
+        getTeams().forEach((obj) -> dataRW.addObject(obj));
 
         try {
             dataRW.writeFile(getSafePath());

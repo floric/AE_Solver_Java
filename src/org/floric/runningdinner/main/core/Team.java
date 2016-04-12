@@ -5,6 +5,7 @@ import org.floric.runningdinner.main.base.IPersistent;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /** Team class
  *
@@ -30,8 +31,6 @@ public class Team implements IPersistent {
         this.pA = pA;
         this.pB = pB;
 
-        Core.getInstance().addTeam(this);
-        Core.getInstance().setToDirtySafeState();
     }
 
     public static int getNextIndex() {
@@ -82,13 +81,15 @@ public class Team implements IPersistent {
     }
 
     public int getGroupIndex() {
-        return Core.getInstance().getTeamGroupIndex(
-                Core.getInstance().getTeamsGroups().stream().filter(teamGroup -> teamGroup.containsTeam(this)).findFirst().get()
-        );
+        try {
+            return Core.getInstance().getTeamGroupIndex(getCurrentGroup());
+        } catch (NoSuchElementException | NullPointerException ex3) {
+            return -1;
+        }
     }
 
-    public TeamGroup getCurrentGroup() {
-        return Core.getInstance().getTeamsGroups().stream().filter(teamGroup -> teamGroup.containsTeam(this)).findFirst().get();
+    public TeamGroup getCurrentGroup() throws NoSuchElementException {
+        return Core.getInstance().getTeamGroups().stream().filter(teamGroup -> teamGroup.containsTeam(this)).findFirst().orElseGet(() -> new TeamGroup(-1));
     }
 
     @Override
